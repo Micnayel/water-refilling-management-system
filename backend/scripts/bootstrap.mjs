@@ -92,6 +92,10 @@ async function main() {
     user: process.env.WRMS_DB_USER ?? "root",
     password: process.env.WRMS_DB_PASSWORD ?? "",
     database: process.env.WRMS_DB_NAME ?? "wrms",
+    ssl:
+      (process.env.WRMS_DB_SSL ?? "").toLowerCase() === "true"
+        ? { minVersion: "TLSv1.2" }
+        : undefined,
   });
 
   const [existing] = await connection.query(

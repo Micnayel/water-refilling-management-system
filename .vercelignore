@@ -1,0 +1,12 @@
+node_modules
+backend/node_modules
+backend/dist
+dist
+dist-types
+coverage
+playwright-report
+test-results
+tests/e2e
+*.log
+.env
+.env.*

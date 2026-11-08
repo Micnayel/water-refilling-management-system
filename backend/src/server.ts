@@ -27,6 +27,7 @@ export async function buildServer(options: ServerOptions = {}): Promise<FastifyI
   const app = Fastify({
     logger: options.logger ?? false,
     bodyLimit: 256 * 1024,
+    trustProxy: env.isVercel,
   });
 
   await app.register(cookie);

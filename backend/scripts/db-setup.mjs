@@ -34,6 +34,10 @@ const config = {
   user: process.env.WRMS_DB_USER ?? "root",
   password: process.env.WRMS_DB_PASSWORD ?? "",
   database: process.env.WRMS_DB_NAME ?? "wrms",
+  ssl:
+    (process.env.WRMS_DB_SSL ?? "").toLowerCase() === "true"
+      ? { minVersion: "TLSv1.2" }
+      : undefined,
 };
 
 if (!/^[A-Za-z0-9_]+$/.test(config.database)) {
@@ -48,6 +52,7 @@ async function main() {
     user: config.user,
     password: config.password,
     multipleStatements: true,
+    ssl: config.ssl,
   });
   await server.query(
     `CREATE DATABASE IF NOT EXISTS \`${config.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
@@ -61,6 +66,7 @@ async function main() {
     password: config.password,
     database: config.database,
     multipleStatements: true,
+    ssl: config.ssl,
   });
 
   await connection.query(`

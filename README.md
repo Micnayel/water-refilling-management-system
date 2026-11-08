@@ -440,9 +440,23 @@ Keep tests under `tests/unit/` in paths mirroring `src/`, and browser tests unde
 
 ## Production hosting
 
-The client expects same-origin `/api/v1` access unless the hosting layer proxies that path to the API. A production server must issue secure HTTP-only session cookies and enforce CSRF protection; those server controls are not implemented in this repository.
+The client expects same-origin `/api/v1` access unless the hosting layer proxies that path to the API. A production server must issue secure HTTP-only session cookies and enforce CSRF protection.
 
 Configure the web server so application routes fall back to `index.html`, while `/api/*` is handled by the API proxy and never by the SPA fallback. Verify direct loading and browser refresh for nested routes such as `/customers/:id`.
+
+### Vercel
+
+A full-stack Vercel deployment uses one project:
+
+- The Vite build is served as static output from `dist`.
+- `api/[...path].ts` is a Node function that hands `/api/*` requests to the same Fastify app the local server uses. It imports the compiled backend from `backend/dist`, so the build runs both TypeScript builds.
+- `vercel.json` sets the install and build commands, the function memory and timeout, and the SPA fallback. The fallback excludes `/api/`.
+- MySQL/MariaDB and Redis are external. Vercel does not provide them. Set `WRMS_DB_*`, `WRMS_REDIS_SESSION_URL`, `WRMS_TURNSTILE_*`, and optionally `WRMS_GOOGLE_GEOCODE_KEY` in the Vercel project.
+- `WRMS_DB_SSL=true` enables TLS for hosted MySQL providers such as TiDB Cloud or Aiven. Use `WRMS_DB_CONNECTION_LIMIT=5` or similar on serverless hosts to stay inside provider limits.
+- `WRMS_REDIS_SESSION_URL` must point at a networked Redis (for example Upstash) so sessions survive across function instances. Without it the API falls back to per-instance memory, which loses sessions.
+- Run `npm run db:setup` once against the hosted database, then run the Administrator bootstrap locally with the same `WRMS_DB_*` values.
+- `NODE_ENV=production` is required so session cookies are marked `secure`.
+- Vercel Functions run in a region you choose. Keep the function region close to the database and Redis to reduce latency.
 
 ## Repository guidance
 

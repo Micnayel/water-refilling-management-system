@@ -28,6 +28,11 @@ function bool(value: string | undefined, fallback: boolean): boolean {
   return value.toLowerCase() === "true" || value === "1";
 }
 
+function positiveInt(value: string | undefined, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.trunc(parsed) : fallback;
+}
+
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? "development",
   port: Number(process.env.WRMS_API_PORT ?? process.env.PORT ?? 8080),
@@ -40,6 +45,8 @@ export const env = {
     user: process.env.WRMS_DB_USER ?? "root",
     password: process.env.WRMS_DB_PASSWORD ?? "",
     database: process.env.WRMS_DB_NAME ?? "wrms",
+    ssl: bool(process.env.WRMS_DB_SSL, false),
+    connectionLimit: positiveInt(process.env.WRMS_DB_CONNECTION_LIMIT, 10),
   },
   redis: {
     sessionUrl: process.env.WRMS_REDIS_SESSION_URL ?? "",
@@ -54,4 +61,10 @@ export const env = {
     geocodeKey: process.env.WRMS_GOOGLE_GEOCODE_KEY ?? "",
   },
   isProduction: (process.env.NODE_ENV ?? "development") === "production",
+  isVercel: Boolean(process.env.VERCEL || process.env.VERCEL_ENV),
 } as const;
+
+/** Shared TLS options for MySQL-compatible providers that require TLS (TiDB, Aiven, PlanetScale). */
+export function databaseSslOptions(ssl: boolean) {
+  return ssl ? { minVersion: "TLSv1.2" as const } : undefined;
+}

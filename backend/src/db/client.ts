@@ -1,6 +1,6 @@
 import mysql from "mysql2/promise";
 import { drizzle } from "drizzle-orm/mysql2";
-import { env } from "../config/env";
+import { databaseSslOptions, env } from "../config/env";
 import * as schema from "./schema";
 
 export type Database = ReturnType<typeof createDatabase>;
@@ -14,9 +14,10 @@ export function createDatabase(overrides?: Partial<typeof env.db>) {
     password: config.password,
     database: config.database,
     waitForConnections: true,
-    connectionLimit: 10,
+    connectionLimit: config.connectionLimit,
     timezone: "+08:00",
     dateStrings: true,
+    ssl: databaseSslOptions(config.ssl),
   });
   return drizzle(pool, { schema, mode: "default" });
 }
