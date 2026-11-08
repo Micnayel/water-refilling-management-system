@@ -5,14 +5,17 @@
   "outputDirectory": "dist",
   "functions": {
     "api/**/*.ts": {
-      "memory": 1024,
       "maxDuration": 30,
       "includeFiles": "backend/dist/**"
     }
   },
   "rewrites": [
     {
-      "source": "/((?!api/).*)",
+      "source": "/api/:path*",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ]

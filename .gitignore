@@ -4,6 +4,7 @@ dist-types/
 coverage/
 playwright-report/
 test-results/
+.vercel/
 .env
 .env.*
 !.env.example
@@ -11,3 +12,5 @@ backend/dist/
 backend/node_modules/
 *.log
 .DS_Store
+
+.vercel

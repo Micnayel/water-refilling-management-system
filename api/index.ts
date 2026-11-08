@@ -1,12 +1,12 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 
 /**
- * Vercel serverless entrypoint.
+ * Vercel serverless entrypoint for the API.
  *
- * Vercel routes every `/api/*` request here, and the same Fastify app that runs
- * locally handles it. The compiled backend is imported at runtime so this
- * function stays a thin adapter. `bodyParser` is disabled because Fastify reads
- * the raw request stream itself.
+ * Every `/api/*` request is rewritten to this function by `vercel.json`, and
+ * the same Fastify app that runs locally answers it. The compiled backend is
+ * imported at runtime so this file stays a thin adapter. `bodyParser` is
+ * disabled because Fastify reads the raw request stream itself.
  */
 export const config = {
   api: {

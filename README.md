@@ -449,8 +449,8 @@ Configure the web server so application routes fall back to `index.html`, while 
 A full-stack Vercel deployment uses one project:
 
 - The Vite build is served as static output from `dist`.
-- `api/[...path].ts` is a Node function that hands `/api/*` requests to the same Fastify app the local server uses. It imports the compiled backend from `backend/dist`, so the build runs both TypeScript builds.
-- `vercel.json` sets the install and build commands, the function memory and timeout, and the SPA fallback. The fallback excludes `/api/`.
+- `api/index.ts` is a Node function that hands `/api/*` requests to the same Fastify app the local server uses. It imports the compiled backend from `backend/dist`, so the build runs both TypeScript builds. `vercel.json` rewrites `/api/*` to this function and routes every other path to `index.html`.
+- A single function is used instead of a catch-all route file because plain Vercel Functions treat `[...name]` as one path segment, not as a catch-all. The rewrite keeps the Fastify routes unchanged.
 - MySQL/MariaDB and Redis are external. Vercel does not provide them. Set `WRMS_DB_*`, `WRMS_REDIS_SESSION_URL`, `WRMS_TURNSTILE_*`, and optionally `WRMS_GOOGLE_GEOCODE_KEY` in the Vercel project.
 - `WRMS_DB_SSL=true` enables TLS for hosted MySQL providers such as TiDB Cloud or Aiven. Use `WRMS_DB_CONNECTION_LIMIT=5` or similar on serverless hosts to stay inside provider limits.
 - `WRMS_REDIS_SESSION_URL` must point at a networked Redis (for example Upstash) so sessions survive across function instances. Without it the API falls back to per-instance memory, which loses sessions.
