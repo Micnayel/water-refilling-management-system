@@ -460,6 +460,7 @@ A full-stack Vercel deployment uses one project:
 - Set environment variables with a method that does not append a newline. On Windows, `echo "value" | vercel env add KEY production` stores a trailing `\n` and the API then fails with a `500` because the host or port no longer matches. Use `printf '%s' "value" | vercel env add ...` instead, and verify with `vercel env pull`.
 - Environment variable changes only reach the functions after a new deployment. Rebuild with `vercel build --prod` and redeploy with `vercel deploy --prebuilt --prod`.
 - Turnstile is optional at the code level: when `WRMS_TURNSTILE_*` is unset, the API serves Cloudflare's test site key and verification is skipped while `TURNSTILE_LOCAL_TEST_MODE` is true. Set real keys and `TURNSTILE_LOCAL_TEST_MODE=false` before treating the deployment as public.
+- `VITE_GOOGLE_MAPS_API_KEY` is inlined at build time, so adding it in the Vercel dashboard is not enough on its own. Export it in the shell that runs `vercel build --prod` (or run `vercel env pull` first), confirm the key appears in `.vercel/output/static/assets/*.js`, then deploy the prebuilt output. Restrict the key by HTTP referrer to the deployment hostname and to the Maps JavaScript API.
 
 ## Repository guidance
 
