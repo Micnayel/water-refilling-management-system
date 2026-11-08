@@ -3,6 +3,7 @@
   "installCommand": "npm ci --include=dev && npm --prefix backend ci --include=dev",
   "buildCommand": "npm run build && npm --prefix backend run build",
   "outputDirectory": "dist",
+  "regions": ["hnd1"],
   "functions": {
     "api/**/*.ts": {
       "maxDuration": 30,

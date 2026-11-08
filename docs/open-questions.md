@@ -15,6 +15,8 @@ Unsettled policies and decisions for the Water Refilling Management System. Reco
 | 9 | Roles | Which default roles exist (for example Administrator, Staff, Driver) and what are their default grants? | Needed for the permissions matrix and seeded role defaults. | Product owner | Open |
 | 11 | Reports | Which reports are required at launch (sales by period, deliveries by staff, stock movement) and in what export formats? | Drives the reports route and `_EXPORT` audit coverage. | Product owner | Open |
 | 12 | Operations | Is there an SMS or email notification requirement for schedule reminders or low stock? | Adds external services, consent rules, and new dependencies. | Product owner | Open |
+| 13 | Deployment | Who owns the Cloudflare account and the production Turnstile keys for the Vercel hostname? The current deployment runs on the Cloudflare test site key with verification skipped (`TURNSTILE_LOCAL_TEST_MODE` defaults to true). | Without production keys and `TURNSTILE_LOCAL_TEST_MODE=false`, registration and sign-in have no bot challenge on the public deployment. | Product owner / Operations | Open |
+| 14 | Deployment | Should the app run in a single Vercel region (`hnd1`, next to TiDB Tokyo) permanently, or move closer to the users in the Philippines? `hnd1` was chosen to sit beside the database. | Adds request latency for users; moving regions means moving the database or accepting cross-region round trips. | Tech lead | Open |
 
 ## Decided
 

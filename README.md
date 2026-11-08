@@ -456,7 +456,10 @@ A full-stack Vercel deployment uses one project:
 - `WRMS_REDIS_SESSION_URL` must point at a networked Redis (for example Upstash) so sessions survive across function instances. Without it the API falls back to per-instance memory, which loses sessions.
 - Run `npm run db:setup` once against the hosted database, then run the Administrator bootstrap locally with the same `WRMS_DB_*` values.
 - `NODE_ENV=production` is required so session cookies are marked `secure`.
-- Vercel Functions run in a region you choose. Keep the function region close to the database and Redis to reduce latency.
+- Vercel Functions run in a region you choose. Keep the function region close to the database and Redis to reduce latency. This project pins the function region with `"regions": ["hnd1"]` in `vercel.json`.
+- Set environment variables with a method that does not append a newline. On Windows, `echo "value" | vercel env add KEY production` stores a trailing `\n` and the API then fails with a `500` because the host or port no longer matches. Use `printf '%s' "value" | vercel env add ...` instead, and verify with `vercel env pull`.
+- Environment variable changes only reach the functions after a new deployment. Rebuild with `vercel build --prod` and redeploy with `vercel deploy --prebuilt --prod`.
+- Turnstile is optional at the code level: when `WRMS_TURNSTILE_*` is unset, the API serves Cloudflare's test site key and verification is skipped while `TURNSTILE_LOCAL_TEST_MODE` is true. Set real keys and `TURNSTILE_LOCAL_TEST_MODE=false` before treating the deployment as public.
 
 ## Repository guidance
 
