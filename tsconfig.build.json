@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "emitDeclarationOnly": false,
+    "outDir": "dist-types",
+    "declaration": false,
+    "types": ["vite/client", "google.maps"]
+  },
+  "include": ["src"]
+}
