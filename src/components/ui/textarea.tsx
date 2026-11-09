@@ -6,7 +6,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
     <textarea
       ref={ref}
       rows={rows}
-      className={cn("compact-input h-auto min-h-[4.5rem] py-2", className)}
+      className={cn("form-control form-control-sm h-auto min-h-[4.5rem] py-2", className)}
       {...props}
     />
   ),

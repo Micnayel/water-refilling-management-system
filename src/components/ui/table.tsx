@@ -6,11 +6,11 @@ export function TableWrap({ className, ...props }: HTMLAttributes<HTMLDivElement
 }
 
 export function Table({ className, ...props }: HTMLAttributes<HTMLTableElement>) {
-  return <table className={cn("w-full caption-bottom text-sm", className)} {...props} />;
+  return <table className={cn("table table-hover table-sm data-table mb-0 w-full", className)} {...props} />;
 }
 
 export function TableHead({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
-  return <thead className={cn("border-b border-border bg-muted/50", className)} {...props} />;
+  return <thead className={cn("border-b border-border", className)} {...props} />;
 }
 
 export function TableBody({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
@@ -18,7 +18,7 @@ export function TableBody({ className, ...props }: HTMLAttributes<HTMLTableSecti
 }
 
 export function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) {
-  return <tr className={cn("transition-colors hover:bg-muted/40", className)} {...props} />;
+  return <tr className={cn("transition-colors", className)} {...props} />;
 }
 
 export function TableHeaderCell({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>) {

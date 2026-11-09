@@ -58,9 +58,9 @@ export function Dialog({
   if (!open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 p-0 backdrop-blur-[2px] sm:items-center sm:p-4">
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 animate-fade-in"
         aria-hidden="true"
         onClick={() => onOpenChange(false)}
       />
@@ -71,11 +71,11 @@ export function Dialog({
         aria-labelledby="dialog-title"
         aria-describedby={description ? "dialog-description" : undefined}
         className={cn(
-          "relative z-10 max-h-[92vh] w-full overflow-y-auto rounded-t-lg border border-border bg-card p-0 shadow-lg sm:rounded-lg",
+          "dialog-panel relative z-10 max-h-[92vh] w-full animate-pop-in overflow-y-auto p-0 sm:max-h-[88vh]",
           size === "wide" ? "max-w-3xl" : "max-w-lg",
         )}
       >
-        <div className="flex items-start justify-between gap-3 border-b border-border p-3">
+        <div className="flex items-start justify-between gap-3 border-b border-border bg-muted/30 p-3">
           <div>
             <h2 id="dialog-title" className="text-sm font-semibold">
               {title}

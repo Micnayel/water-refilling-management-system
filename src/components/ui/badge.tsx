@@ -2,21 +2,18 @@ import type { HTMLAttributes } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
-  {
-    variants: {
-      tone: {
-        neutral: "border-border bg-muted text-muted-foreground",
-        primary: "border-transparent bg-primary/10 text-primary",
-        success: "border-transparent bg-success/10 text-success",
-        warning: "border-transparent bg-warning/10 text-warning",
-        destructive: "border-transparent bg-destructive/10 text-destructive",
-      },
+const badgeVariants = cva("badge badge-subtle", {
+  variants: {
+    tone: {
+      neutral: "theme-secondary",
+      primary: "theme-primary",
+      success: "theme-success",
+      warning: "theme-warning",
+      destructive: "theme-danger",
     },
-    defaultVariants: { tone: "neutral" },
   },
-);
+  defaultVariants: { tone: "neutral" },
+});
 
 export interface BadgeProps
   extends HTMLAttributes<HTMLSpanElement>,

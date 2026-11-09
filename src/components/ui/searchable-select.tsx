@@ -80,22 +80,25 @@ export function SearchableSelect({
         aria-haspopup="listbox"
         disabled={disabled}
         onClick={() => setOpen((previous) => !previous)}
-        className={cn("compact-input flex items-center justify-between gap-2 text-left", disabled && "opacity-60")}
+        className={cn(
+          "form-control form-control-sm flex items-center justify-between gap-2 text-left",
+          disabled && "opacity-60",
+        )}
         {...aria}
       >
         <span className={cn("truncate", !selected && "text-muted-foreground")}>
           {selected ? selected.label : placeholder}
         </span>
-        <ChevronDownIcon className="text-muted-foreground" />
+        <ChevronDownIcon className="size-4 text-muted-foreground" />
       </button>
 
       {open ? (
-        <div className="absolute z-30 mt-1 w-full rounded-md border border-border bg-popover p-2 shadow-lg">
+        <div className="dialog-panel absolute z-30 mt-1 w-full p-2">
           <div className="relative mb-1">
-            <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <SearchIcon className="absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <input
               autoFocus
-              className="compact-input pl-7"
+              className="form-control form-control-sm pl-7"
               placeholder={searchPlaceholder}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -111,7 +114,7 @@ export function SearchableSelect({
                   <button
                     type="button"
                     className={cn(
-                      "flex w-full flex-col rounded px-2 py-1.5 text-left hover:bg-muted",
+                      "btn-reset flex w-full flex-col rounded-md px-2 py-1.5 text-left transition-colors hover:bg-muted",
                       option.value === value && "bg-accent text-accent-foreground",
                     )}
                     onClick={() => {

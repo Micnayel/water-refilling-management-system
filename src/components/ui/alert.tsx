@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils";
 type AlertTone = "info" | "success" | "warning" | "destructive";
 
 const toneClasses: Record<AlertTone, string> = {
-  info: "border-primary/30 bg-primary/5 text-foreground",
-  success: "border-success/30 bg-success/5 text-foreground",
-  warning: "border-warning/30 bg-warning/5 text-foreground",
-  destructive: "border-destructive/30 bg-destructive/5 text-foreground",
+  info: "theme-primary",
+  success: "theme-success",
+  warning: "theme-warning",
+  destructive: "theme-danger",
 };
 
 const toneIcon = {
@@ -27,10 +27,25 @@ export function Alert({ className, tone = "info", children, ...props }: AlertPro
   return (
     <div
       role={tone === "destructive" ? "alert" : "status"}
-      className={cn("flex items-start gap-2 rounded-md border p-2.5 text-sm", toneClasses[tone], className)}
+      className={cn(
+        "alert flex items-start gap-2 p-2.5 text-sm text-foreground",
+        toneClasses[tone],
+        className,
+      )}
       {...props}
     >
-      <Icon className={cn("mt-0.5 size-4", tone === "success" ? "text-success" : tone === "warning" ? "text-warning" : tone === "destructive" ? "text-destructive" : "text-primary")} />
+      <Icon
+        className={cn(
+          "mt-0.5 size-4",
+          tone === "success"
+            ? "text-success"
+            : tone === "warning"
+              ? "text-warning"
+              : tone === "destructive"
+                ? "text-destructive"
+                : "text-primary",
+        )}
+      />
       <div className="flex-1">{children}</div>
     </div>
   );

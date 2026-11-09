@@ -1,10 +1,9 @@
 import { forwardRef, type HTMLAttributes, type SelectHTMLAttributes } from "react";
-import { ChevronDownIcon } from "./icons";
 import { cn } from "@/lib/utils";
 
 export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("card-surface", className)} {...props} />
+    <div ref={ref} className={cn("card card-surface", className)} {...props} />
   ),
 );
 Card.displayName = "Card";
@@ -14,7 +13,7 @@ export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElemen
 }
 
 export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return <h2 className={cn("text-sm font-semibold", className)} {...props} />;
+  return <h2 className={cn("text-sm font-semibold tracking-tight", className)} {...props} />;
 }
 
 export function CardDescription({ className, ...props }: HTMLAttributes<HTMLParagraphElement>) {
@@ -31,16 +30,13 @@ export function CardFooter({ className, ...props }: HTMLAttributes<HTMLDivElemen
 
 export const NativeSelect = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(
   ({ className, children, ...props }, ref) => (
-    <div className="relative">
-      <select
-        ref={ref}
-        className={cn("compact-input appearance-none pr-8", className)}
-        {...props}
-      >
-        {children}
-      </select>
-      <ChevronDownIcon className="pointer-events-none absolute right-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-    </div>
+    <select
+      ref={ref}
+      className={cn("form-control form-control-sm", className)}
+      {...props}
+    >
+      {children}
+    </select>
   ),
 );
 NativeSelect.displayName = "NativeSelect";

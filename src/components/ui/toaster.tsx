@@ -3,9 +3,9 @@ import { XIcon } from "./icons";
 import { cn } from "@/lib/utils";
 
 const toneClass = {
-  success: "border-success/40 bg-success/10 text-foreground",
-  error: "border-destructive/40 bg-destructive/10 text-foreground",
-  info: "border-border bg-card text-foreground",
+  success: "border-success/40 bg-card text-foreground before:bg-success",
+  error: "border-destructive/40 bg-card text-foreground before:bg-destructive",
+  info: "border-border bg-card text-foreground before:bg-primary",
 };
 
 export function Toaster() {
@@ -21,13 +21,17 @@ export function Toaster() {
       {messages.map((message) => (
         <div
           key={message.id}
-          className={cn("flex items-start justify-between gap-2 rounded-md border p-2.5 text-sm shadow-md", toneClass[message.tone])}
+          className={cn(
+            "animate-rise relative flex items-start justify-between gap-2 overflow-hidden rounded-lg border p-2.5 pl-3.5 text-sm before:absolute before:inset-y-0 before:left-0 before:w-1",
+            "shadow-[var(--shadow-raised)]",
+            toneClass[message.tone],
+          )}
         >
           <span>{message.title}</span>
           <button
             type="button"
             aria-label="Dismiss notification"
-            className="rounded p-0.5 hover:bg-muted"
+            className="btn-reset rounded p-0.5 hover:bg-muted"
             onClick={() => dismiss(message.id)}
           >
             <XIcon className="size-3.5" />

@@ -60,7 +60,7 @@ export function InventoryListPage() {
         }
       />
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="toolbar-surface inline-flex flex-wrap items-center gap-3">
         <Checkbox
           id="low-stock"
           label="Low stock only"

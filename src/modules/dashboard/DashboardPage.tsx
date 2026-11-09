@@ -6,6 +6,15 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { PageHeader } from "@/components/ui/page-header";
+import {
+  ArrowRightIcon,
+  DropletIcon,
+  MapPinIcon,
+  PackageIcon,
+  TrendingUpIcon,
+  UsersIcon,
+  WalletIcon,
+} from "@/components/ui/icons";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Skeleton, SkeletonRows } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
@@ -82,79 +91,108 @@ export function DashboardPage() {
       value: formatCentavos(data.salesTodayCentavos),
       hint: `${formatNumber(data.salesTodayCount)} completed today`,
       to: "/reports",
+      icon: WalletIcon,
     },
     {
       label: "Clients",
       value: formatNumber(data.clientCount),
       hint: `${data.clientLocationStats.length} areas`,
       to: "/customers",
+      icon: UsersIcon,
     },
     {
       label: "Full gallons",
       value: formatNumber(data.inventoryFull),
       hint: `${formatNumber(data.inventoryWithCustomer)} with customers`,
       to: "/inventory",
+      icon: PackageIcon,
     },
     {
       label: "Low stock items",
       value: formatNumber(data.lowStockCount),
       hint: data.lowStockCount > 0 ? "Needs attention" : "All above reorder level",
       to: "/inventory",
+      icon: TrendingUpIcon,
     },
   ];
+  const maxAreaCount = Math.max(1, ...data.clientLocationStats.map((stat) => stat.count));
 
   return (
-    <div className="space-y-3">
+    <div className="animate-rise space-y-3">
       <PageHeader
         title="Dashboard"
         description="Sales, clients, locations, and inventory from aggregated API responses."
         actions={
           canReveal ? (
             <Button variant="outline" onClick={() => setDialogOpen(true)}>
-              Reveal exact location
+              <MapPinIcon /> Reveal exact location
             </Button>
           ) : null
         }
       />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((card) => (
-          <Card key={card.label}>
-            <CardHeader className="pb-1">
-              <CardTitle className="text-xs font-medium text-muted-foreground">{card.label}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-xl font-semibold">{card.value}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">{card.hint}</p>
-              <Link to={card.to} className="mt-2 inline-block text-xs text-primary hover:underline">
-                Open module
-              </Link>
-            </CardContent>
-          </Card>
-        ))}
+        {cards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <Card key={card.label} className="stat-card">
+              <CardContent className="flex items-start gap-3 p-3">
+                <span className="stat-icon">
+                  <Icon className="size-4" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[0.6875rem] font-medium uppercase tracking-wider text-muted-foreground">
+                    {card.label}
+                  </p>
+                  <p className="mt-0.5 text-2xl font-semibold tabular-nums tracking-tight">{card.value}</p>
+                  <div className="mt-1 flex items-center justify-between gap-2">
+                    <p className="truncate text-xs text-muted-foreground">{card.hint}</p>
+                    <Link
+                      to={card.to}
+                      aria-label={`Open ${card.label}`}
+                      className="flex size-6 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                    >
+                      <ArrowRightIcon className="size-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       <div className="grid gap-3 lg:grid-cols-2">
         <Card>
-          <CardHeader>
-            <CardTitle>Customer locations</CardTitle>
-            <p className="text-xs text-muted-foreground">
-              Pins are grouped by barangay and rounded. Exact locations need an audited reveal.
-            </p>
+          <CardHeader className="flex-row items-center justify-between gap-2">
+            <div>
+              <CardTitle className="flex items-center gap-1.5">
+                <MapPinIcon className="size-4 text-primary" /> Customer locations
+              </CardTitle>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Pins are grouped by barangay and rounded. Exact locations need an audited reveal.
+              </p>
+            </div>
           </CardHeader>
           <CardContent>
             {map.isError ? (
               <ErrorState description={apiMessage(map.error)} />
             ) : (
-              <BaseMap points={map.data?.points ?? []} height="18rem" ariaLabel="Masked customer location map" />
+              <div className="overflow-hidden rounded-lg border border-border">
+                <BaseMap points={map.data?.points ?? []} height="18rem" ariaLabel="Masked customer location map" />
+              </div>
             )}
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Clients by area</CardTitle>
-            <p className="text-xs text-muted-foreground">Non-map alternative with the same data.</p>
+          <CardHeader className="flex-row items-center justify-between gap-2">
+            <div>
+              <CardTitle className="flex items-center gap-1.5">
+                <DropletIcon className="size-4 text-primary" /> Clients by area
+              </CardTitle>
+              <p className="mt-1 text-xs text-muted-foreground">Non-map alternative with the same data.</p>
+            </div>
           </CardHeader>
           <CardContent className="p-0">
             {data.clientLocationStats.length === 0 ? (
@@ -162,9 +200,15 @@ export function DashboardPage() {
             ) : (
               <ul className="divide-y divide-border">
                 {data.clientLocationStats.map((stat) => (
-                  <li key={stat.area} className="flex items-center justify-between px-3 py-2 text-sm">
-                    <span>{stat.area}</span>
-                    <span className="font-medium">{formatNumber(stat.count)}</span>
+                  <li key={stat.area} className="flex items-center gap-3 px-3 py-2 text-sm">
+                    <span className="w-32 truncate sm:w-40">{stat.area}</span>
+                    <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                      <span
+                        className="block h-full rounded-full bg-primary"
+                        style={{ width: `${Math.max(6, (stat.count / maxAreaCount) * 100)}%` }}
+                      />
+                    </span>
+                    <span className="w-8 text-right font-medium tabular-nums">{formatNumber(stat.count)}</span>
                   </li>
                 ))}
               </ul>

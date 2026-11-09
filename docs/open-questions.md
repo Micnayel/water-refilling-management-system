@@ -17,6 +17,7 @@ Unsettled policies and decisions for the Water Refilling Management System. Reco
 | 12 | Operations | Is there an SMS or email notification requirement for schedule reminders or low stock? | Adds external services, consent rules, and new dependencies. | Product owner | Open |
 | 13 | Deployment | Who owns the Cloudflare account and the production Turnstile keys for the Vercel hostname? The current deployment runs on the Cloudflare test site key with verification skipped (`TURNSTILE_LOCAL_TEST_MODE` defaults to true). | Without production keys and `TURNSTILE_LOCAL_TEST_MODE=false`, registration and sign-in have no bot challenge on the public deployment. | Product owner / Operations | Open |
 | 14 | Deployment | Should the app run in a single Vercel region (`hnd1`, next to TiDB Tokyo) permanently, or move closer to the users in the Philippines? `hnd1` was chosen to sit beside the database. | Adds request latency for users; moving regions means moving the database or accepting cross-region round trips. | Tech lead | Open |
+| 15 | Design system | Bootstrap 6.0.0-alpha.1 is the component layer while Tailwind 3 supplies utilities. When does the project move to a stable Bootstrap 6 release, and who watches for breaking changes in the alpha's `theme-*` and `btn-*` APIs? | An alpha dependency can change class names or CSS variables between releases; the token bridge and primitives would need updating. | Tech lead | Open |
 
 ## Decided
 

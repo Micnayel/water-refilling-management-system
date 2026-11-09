@@ -170,7 +170,7 @@ npm.cmd run build
 | --- | --- |
 | Application | React 19, TypeScript 5.9, Vite 6 |
 | Routing | React Router 7 |
-| Styling | Tailwind CSS 3 and compact UI primitives; system templates swap design-token values |
+| Styling | Tailwind CSS 3 for layout and utilities, Bootstrap 6 alpha for components, compact UI primitives; system templates swap design-token values |
 | Server state | TanStack Query |
 | Client state | Zustand for session, appearance, and UI state |
 | Forms and validation | React Hook Form and Zod schemas where adopted |
@@ -290,6 +290,10 @@ All screens use the compact application language defined by the existing UI and 
 - Catalog selection uses `SearchableSelect` with code/name labels and sublabels.
 - Dialogs use the fixed `Dialog` primitive `Header`/`Body`/`Footer` regions (`bleed` headers, `max-w-2xl`/`max-w-3xl` for wide forms); lifecycle changes reuse the shared `StatusStepperDialog`.
 - Use `PageHeader`, cards, filters, tables, modals, alerts, skeletons, and responsive mobile cards consistently.
+- Bootstrap 6 alpha supplies component styling (`btn`/`btn-solid`/`theme-*`, `form-control`, `table`, `badge`, `alert`). Tailwind supplies layout and utilities. The primitives in `src/components/ui` wrap both so screens do not mix the two vocabularies.
+- Bootstrap is vendored to `public/vendor/bootstrap.css` by `scripts/sync-bootstrap.mjs` (run automatically before `dev`, `dev:web`, and `build`) and linked in `index.html`. It must not be imported through the app CSS: Tailwind's PostCSS plugin mistakes Bootstrap's native `@layer` rules for Tailwind directives. Tailwind Preflight is disabled so it cannot outrank Bootstrap's layered components; the few resets the app needs live in `src/index.css`.
+- Bootstrap and Tailwind share class names (`.grid`, `.flex-row`, spacing). Keep Tailwind utilities authoritative for layout, and do not remove the `.grid` override in `src/index.css`.
+- Bootstrap component colors come from template tokens through the `--bs-*` bridge in `src/index.css`. Components use `theme-primary`, `theme-success`, `theme-danger`, and so on instead of Bootstrap's removed `btn-primary`/`badge-primary` names.
 - Use `h-8` controls, `text-sm` body copy, `text-xs` metadata, and compact table rows.
 - Use design tokens such as `bg-primary`, `text-muted-foreground`, `border-border`, `text-success`, and `text-warning`.
 - Do not add raw color values in components. System templates work only by redefining these tokens, and every template must keep accessible text contrast.

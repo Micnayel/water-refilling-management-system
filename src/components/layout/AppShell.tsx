@@ -24,18 +24,8 @@ import { SessionTimeout } from "@/components/session/SessionTimeout";
 function NavEntry({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) {
   const Icon = item.icon;
   return (
-    <NavLink
-      to={item.to}
-      end={item.end}
-      onClick={onNavigate}
-      className={({ isActive }) =>
-        cn(
-          "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-          isActive && "bg-accent font-medium text-accent-foreground",
-        )
-      }
-    >
-      <Icon className="size-4" />
+    <NavLink to={item.to} end={item.end} onClick={onNavigate} className="nav-pill">
+      <Icon className="size-4 shrink-0" />
       <span className="truncate">{item.label}</span>
     </NavLink>
   );
@@ -45,14 +35,22 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
   const user = useSessionStore((state) => state.user);
   return (
     <div className="flex h-full flex-col">
-      <Link to="/" className="flex items-center gap-2 border-b border-border px-3 py-3">
-        <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+      <Link
+        to="/"
+        className={cn(
+          "flex items-center gap-2.5 border-b border-border/70 px-3 py-3",
+          collapsed && "justify-center",
+        )}
+      >
+        <span className="brand-mark flex size-8 shrink-0 items-center justify-center rounded-lg text-primary-foreground">
           <DropletIcon className="size-4" />
         </span>
         {!collapsed ? (
           <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold">{brand.shortName}</span>
-            <span className="block truncate text-xs text-muted-foreground">Management</span>
+            <span className="block truncate text-sm font-semibold tracking-tight">{brand.shortName}</span>
+            <span className="block truncate text-[0.6875rem] uppercase tracking-widest text-muted-foreground">
+              Management
+            </span>
           </span>
         ) : null}
       </Link>
@@ -63,10 +61,12 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
           return (
             <div key={group.label} className="mb-3">
               {!collapsed ? (
-                <p className="mb-1 px-2 text-[0.625rem] font-semibold uppercase tracking-wider text-muted-foreground">
+                <p className="mb-1 px-2 text-[0.625rem] font-semibold uppercase tracking-wider text-muted-foreground/80">
                   {group.label}
                 </p>
-              ) : null}
+              ) : (
+                <div className="mx-auto mb-1 h-px w-6 bg-border" aria-hidden="true" />
+              )}
               <div className="space-y-0.5">
                 {items.map((item) => (
                   <NavEntry key={item.to} item={item} onNavigate={onNavigate} />
@@ -77,7 +77,16 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
         })}
       </nav>
       {!collapsed ? (
-        <p className="border-t border-border p-3 text-xs text-muted-foreground">{brand.supportNote}</p>
+        <div className="space-y-2 border-t border-border/70 p-3">
+          <div className="flex items-center gap-2 rounded-lg border border-border/70 bg-card/60 px-2 py-1.5">
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex size-2 animate-ping rounded-full bg-success opacity-60" />
+              <span className="relative inline-flex size-2 rounded-full bg-success" />
+            </span>
+            <span className="text-[0.6875rem] text-muted-foreground">API operational</span>
+          </div>
+          <p className="text-[0.6875rem] leading-relaxed text-muted-foreground">{brand.supportNote}</p>
+        </div>
       ) : null}
     </div>
   );
@@ -92,9 +101,15 @@ export function AppShell() {
   const logout = useLogoutMutation();
   const canSeeNotifications = usePermission("notifications:view");
 
-  const activeLabel =
-    navigation.flatMap((group) => group.items).find((item) => item.to === location.pathname)?.label ??
-    "Workspace";
+  const allItems = navigation.flatMap((group) => group.items);
+  const activeItem =
+    allItems.find((item) => item.end && location.pathname === item.to) ??
+    allItems
+      .filter((item) => !item.end && location.pathname.startsWith(item.to))
+      .sort((a, b) => b.to.length - a.to.length)[0];
+  const activeLabel = activeItem?.label ?? "Workspace";
+  const activeGroup =
+    navigation.find((group) => group.items.some((item) => item.to === activeItem?.to))?.label ?? "Workspace";
 
   const onLogout = async () => {
     try {
@@ -105,7 +120,7 @@ export function AppShell() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="app-canvas flex min-h-screen">
       <a
         href="#main-content"
         className="screen-reader-text focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-primary focus:px-3 focus:py-1.5 focus:text-primary-foreground"
@@ -115,8 +130,8 @@ export function AppShell() {
 
       <aside
         className={cn(
-          "hidden shrink-0 border-r border-border bg-card transition-[width] lg:block",
-          sidebarCollapsed ? "w-16" : "w-60",
+          "app-sidebar sticky top-0 hidden h-screen shrink-0 border-r border-border/70 transition-[width] duration-200 lg:block",
+          sidebarCollapsed ? "w-[4.25rem]" : "w-60",
         )}
       >
         <SidebarContent collapsed={sidebarCollapsed} />
@@ -125,11 +140,11 @@ export function AppShell() {
       {mobileNavOpen ? (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 animate-fade-in bg-foreground/45 backdrop-blur-[2px]"
             aria-hidden="true"
             onClick={() => setMobileNav(false)}
           />
-          <div className="relative z-10 h-full w-64 border-r border-border bg-card">
+          <div className="app-sidebar relative z-10 h-full w-64 animate-pop-in border-r border-border">
             <div className="absolute right-2 top-2">
               <Button variant="ghost" size="icon" aria-label="Close navigation" onClick={() => setMobileNav(false)}>
                 <XIcon />
@@ -141,7 +156,7 @@ export function AppShell() {
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-12 items-center gap-2 border-b border-border bg-card/95 px-3 backdrop-blur">
+        <header className="sticky top-0 z-20 flex h-12 items-center gap-2 border-b border-border/70 bg-card/80 px-3 backdrop-blur-md">
           <Button
             variant="ghost"
             size="icon"
@@ -161,7 +176,10 @@ export function AppShell() {
             {sidebarCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
           </Button>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium">{activeLabel}</p>
+            <p className="truncate text-[0.625rem] font-medium uppercase tracking-wider text-muted-foreground">
+              {activeGroup}
+            </p>
+            <p className="truncate text-sm font-semibold leading-tight">{activeLabel}</p>
           </div>
           {canSeeNotifications ? (
             <Button variant="ghost" size="icon" aria-label="Notifications" onClick={() => navigate("/notifications")}>
@@ -171,12 +189,12 @@ export function AppShell() {
           <div className="relative">
             <button
               type="button"
-              className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted"
+              className="btn-reset flex items-center gap-2 rounded-full border border-transparent p-0.5 pr-2 transition-colors hover:border-border hover:bg-muted"
               aria-haspopup="menu"
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((open) => !open)}
             >
-              <span className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+              <span className="flex size-7 items-center justify-center rounded-full bg-primary text-[0.6875rem] font-semibold text-primary-foreground ring-2 ring-primary/15">
                 {user ? initials(user.fullName) : "?"}
               </span>
               <span className="hidden max-w-[10rem] truncate text-sm sm:block">{user?.fullName}</span>
@@ -184,7 +202,7 @@ export function AppShell() {
             {menuOpen ? (
               <div
                 role="menu"
-                className="absolute right-0 top-full z-30 mt-1 w-56 rounded-md border border-border bg-popover p-2 shadow-lg"
+                className="dialog-panel absolute right-0 top-full z-30 mt-1.5 w-60 animate-pop-in p-2"
                 onMouseLeave={() => setMenuOpen(false)}
               >
                 <div className="space-y-0.5 border-b border-border p-1 pb-2">
@@ -198,7 +216,7 @@ export function AppShell() {
                   <Link
                     to="/settings"
                     role="menuitem"
-                    className="block rounded px-2 py-1.5 text-sm hover:bg-muted"
+                    className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted"
                     onClick={() => setMenuOpen(false)}
                   >
                     Settings
@@ -206,7 +224,7 @@ export function AppShell() {
                   <button
                     type="button"
                     role="menuitem"
-                    className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-muted"
+                    className="btn-reset flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-muted"
                     onClick={() => void onLogout()}
                   >
                     <LogOutIcon /> Sign out
@@ -218,7 +236,9 @@ export function AppShell() {
         </header>
 
         <main id="main-content" className="flex-1 p-3 lg:p-4">
-          <Outlet />
+          <div className="mx-auto w-full max-w-[92rem]">
+            <Outlet />
+          </div>
         </main>
       </div>
 

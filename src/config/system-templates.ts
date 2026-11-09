@@ -42,6 +42,9 @@ export function applyTemplate(id: string): void {
   if (typeof document === "undefined") return;
   const template = isKnownTemplate(id) ? id : DEFAULT_TEMPLATE_ID;
   document.documentElement.dataset.theme = template;
+  // Keep Bootstrap component internals (carets, shadows, light-dark tokens) in
+  // sync with the template without hardcoding colors in any component.
+  document.documentElement.dataset.bsTheme = template === "midnight" ? "dark" : "light";
 }
 
 export function templateName(id: string): string {

@@ -63,7 +63,7 @@ export function ScheduleListPage() {
         }
       />
 
-      <div className="flex flex-wrap items-end gap-2">
+      <div className="toolbar-surface flex flex-wrap items-end gap-2">
         <div className="w-40">
           <label htmlFor="schedule-status" className="text-xs font-medium text-muted-foreground">
             Status

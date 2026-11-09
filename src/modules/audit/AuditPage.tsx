@@ -32,7 +32,7 @@ export function AuditPage() {
         description="Opaque records of sensitive and administrative actions."
       />
 
-      <div className="flex flex-wrap items-end gap-2">
+      <div className="toolbar-surface flex flex-wrap items-end gap-2">
         <div>
           <label htmlFor="audit-event" className="text-xs font-medium text-muted-foreground">
             Event

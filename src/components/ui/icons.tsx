@@ -250,3 +250,39 @@ export function LoaderIcon(props: IconProps) {
     </Svg>
   );
 }
+
+export function WalletIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M4 7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" />
+      <path d="M16 12h4M4 9h16" />
+      <circle cx="16.5" cy="12" r="0.6" fill="currentColor" stroke="none" />
+    </Svg>
+  );
+}
+
+export function TrendingUpIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M3 17l6-6 4 4 7-8" />
+      <path d="M15 7h5v5" />
+    </Svg>
+  );
+}
+
+export function MapPinIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </Svg>
+  );
+}
+
+export function ArrowRightIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M5 12h14M13 5l7 7-7 7" />
+    </Svg>
+  );
+}

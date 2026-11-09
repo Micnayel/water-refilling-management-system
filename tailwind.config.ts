@@ -3,6 +3,11 @@ import type { Config } from "tailwindcss";
 const config: Config = {
   darkMode: ["class", "[data-theme='dark']"],
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  corePlugins: {
+    // Bootstrap 6's Reboot is the reset layer; Tailwind's preflight would win
+    // over Bootstrap's layered components because it is emitted unlayered.
+    preflight: false,
+  },
   theme: {
     extend: {
       colors: {

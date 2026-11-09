@@ -93,7 +93,7 @@ export function UserListPage() {
         }
       />
 
-      <form className="flex flex-wrap items-end gap-2" onSubmit={onSearch} role="search">
+      <form className="toolbar-surface flex flex-wrap items-end gap-2" onSubmit={onSearch} role="search">
         <div className="min-w-[12rem] flex-1">
           <label htmlFor="user-search" className="text-xs font-medium text-muted-foreground">
             Search

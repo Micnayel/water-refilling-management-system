@@ -27,6 +27,14 @@
     --ring: 205 90% 35%;
     --radius: 0.5rem;
     --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+
+    /* Derived design tokens. Templates only swap the values above. */
+    --radius-card: 0.875rem;
+    --radius-pill: 999px;
+    --shadow-card: 0 1px 2px hsl(var(--foreground) / 0.05), 0 14px 34px -24px hsl(var(--foreground) / 0.35);
+    --shadow-raised: 0 3px 6px hsl(var(--foreground) / 0.06), 0 22px 48px -22px hsl(var(--foreground) / 0.4);
+    --gradient-brand: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-foreground)) 100%);
+    --gradient-sheen: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.55) 100%);
   }
 
   [data-theme="ocean"] {
@@ -145,16 +153,134 @@
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
     font-size: 0.875rem;
+    text-rendering: optimizeLegibility;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  /* Minimal preflight replacements. Tailwind preflight is off so it cannot
+     override Bootstrap's layered components; these rules restore the few
+     resets the app relies on. */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  ul,
+  ol,
+  figure,
+  blockquote {
+    margin: 0;
+  }
+
+  ul,
+  ol {
+    padding: 0;
+    list-style: none;
   }
 
   :focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
+
+  /* Bootstrap 6 design tokens are fed from the template tokens above, so every
+     template restyles Bootstrap components without touching a component file. */
+  :root,
+  [data-theme] {
+    --bs-body-font-family: var(--font-sans);
+    --bs-body-font-size: 0.875rem;
+    --bs-body-color: hsl(var(--foreground));
+    --bs-body-bg: hsl(var(--background));
+    --bs-bg-body: hsl(var(--background));
+    --bs-bg-1: hsl(var(--card));
+    --bs-bg-2: hsl(var(--muted));
+    --bs-bg-3: hsl(var(--secondary));
+    --bs-fg-body: hsl(var(--foreground));
+    --bs-fg-1: hsl(var(--foreground));
+    --bs-fg-2: hsl(var(--muted-foreground));
+    --bs-fg-3: hsl(var(--muted-foreground));
+    --bs-heading-color: hsl(var(--foreground));
+    --bs-border-color: hsl(var(--border));
+    --bs-border-color-translucent: hsl(var(--border) / 0.6);
+    --bs-radius-5: calc(var(--radius) - 2px);
+    --bs-radius-7: var(--radius-card);
+    --bs-link-color: hsl(var(--primary));
+    --bs-link-hover-color: hsl(var(--primary) / 0.85);
+
+    --bs-primary-base: hsl(var(--primary));
+    --bs-primary-bg: hsl(var(--primary));
+    --bs-primary-bg-subtle: hsl(var(--primary) / 0.12);
+    --bs-primary-bg-muted: hsl(var(--primary) / 0.2);
+    --bs-primary-border: hsl(var(--primary) / 0.35);
+    --bs-primary-fg: hsl(var(--primary));
+    --bs-primary-fg-emphasis: hsl(var(--primary));
+    --bs-primary-focus-ring: hsl(var(--ring) / 0.3);
+    --bs-primary-contrast: hsl(var(--primary-foreground));
+
+    --bs-secondary-base: hsl(var(--secondary));
+    --bs-secondary-bg: hsl(var(--secondary));
+    --bs-secondary-bg-subtle: hsl(var(--secondary));
+    --bs-secondary-bg-muted: hsl(var(--muted));
+    --bs-secondary-border: hsl(var(--border));
+    --bs-secondary-fg: hsl(var(--secondary-foreground));
+    --bs-secondary-fg-emphasis: hsl(var(--secondary-foreground));
+    --bs-secondary-focus-ring: hsl(var(--ring) / 0.3);
+    --bs-secondary-contrast: hsl(var(--secondary-foreground));
+
+    --bs-success-base: hsl(var(--success));
+    --bs-success-bg: hsl(var(--success));
+    --bs-success-bg-subtle: hsl(var(--success) / 0.12);
+    --bs-success-bg-muted: hsl(var(--success) / 0.2);
+    --bs-success-border: hsl(var(--success) / 0.35);
+    --bs-success-fg: hsl(var(--success));
+    --bs-success-fg-emphasis: hsl(var(--success));
+    --bs-success-focus-ring: hsl(var(--success) / 0.3);
+    --bs-success-contrast: hsl(var(--background));
+
+    --bs-danger-base: hsl(var(--destructive));
+    --bs-danger-bg: hsl(var(--destructive));
+    --bs-danger-bg-subtle: hsl(var(--destructive) / 0.12);
+    --bs-danger-bg-muted: hsl(var(--destructive) / 0.2);
+    --bs-danger-border: hsl(var(--destructive) / 0.35);
+    --bs-danger-fg: hsl(var(--destructive));
+    --bs-danger-fg-emphasis: hsl(var(--destructive));
+    --bs-danger-focus-ring: hsl(var(--destructive) / 0.3);
+    --bs-danger-contrast: hsl(var(--destructive-foreground));
+
+    --bs-warning-base: hsl(var(--warning));
+    --bs-warning-bg: hsl(var(--warning));
+    --bs-warning-bg-subtle: hsl(var(--warning) / 0.12);
+    --bs-warning-bg-muted: hsl(var(--warning) / 0.2);
+    --bs-warning-border: hsl(var(--warning) / 0.35);
+    --bs-warning-fg: hsl(var(--warning));
+    --bs-warning-fg-emphasis: hsl(var(--warning));
+    --bs-warning-focus-ring: hsl(var(--warning) / 0.3);
+    --bs-warning-contrast: hsl(var(--background));
+
+    --bs-info-base: hsl(var(--primary));
+    --bs-info-bg: hsl(var(--primary));
+    --bs-info-bg-subtle: hsl(var(--primary) / 0.12);
+    --bs-info-bg-muted: hsl(var(--primary) / 0.2);
+    --bs-info-border: hsl(var(--primary) / 0.35);
+    --bs-info-fg: hsl(var(--primary));
+    --bs-info-fg-emphasis: hsl(var(--primary));
+    --bs-info-focus-ring: hsl(var(--ring) / 0.3);
+    --bs-info-contrast: hsl(var(--primary-foreground));
+
+    --bs-focus-ring-color: hsl(var(--ring) / 0.35);
+    --bs-focus-ring-width: 3px;
+  }
 }
 
 @layer components {
   .card-surface {
-    @apply rounded-lg border border-border bg-card text-card-foreground shadow-sm;
+    @apply rounded-xl border border-border bg-card text-card-foreground;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
   }
 
   .compact-input {
@@ -172,8 +298,258 @@
     white-space: nowrap;
     border-width: 0;
   }
+
+  .btn-reset {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  /* App canvas */
+  .app-canvas {
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(70rem 46rem at 112% -18%, hsl(var(--primary) / 0.09), transparent 62%),
+      radial-gradient(48rem 34rem at -12% 108%, hsl(var(--accent) / 0.7), transparent 62%);
+    background-attachment: fixed;
+  }
+
+  .app-sidebar {
+    background-image: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--card)) 62%, hsl(var(--muted) / 0.45) 100%);
+  }
+
+  .brand-mark {
+    background-image: var(--gradient-brand);
+    box-shadow: 0 6px 16px -8px hsl(var(--primary) / 0.9), inset 0 1px 0 hsl(0 0% 100% / 0.25);
+  }
+
+  .nav-pill {
+    position: relative;
+    @apply flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-all duration-150;
+  }
+
+  .nav-pill:hover {
+    @apply bg-muted text-foreground;
+  }
+
+  .nav-pill[aria-current="page"] {
+    background-color: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+    font-weight: 600;
+  }
+
+  .nav-pill[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    left: -0.5rem;
+    top: 0.3rem;
+    bottom: 0.3rem;
+    width: 3px;
+    border-radius: var(--radius-pill);
+    background-color: hsl(var(--primary));
+  }
+
+  .nav-pill[aria-current="page"] svg {
+    color: hsl(var(--primary));
+  }
+
+  .stat-card {
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 180ms ease, transform 180ms ease;
+  }
+
+  .stat-card::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background-image: var(--gradient-brand);
+    opacity: 0.85;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-raised);
+  }
+
+  .stat-icon {
+    @apply flex size-8 items-center justify-center rounded-lg;
+    background-color: hsl(var(--primary) / 0.12);
+    color: hsl(var(--primary));
+  }
+
+  .toolbar-surface {
+    @apply rounded-xl border border-border p-2.5;
+    background-image: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.35) 100%);
+    box-shadow: 0 1px 2px hsl(var(--foreground) / 0.03);
+  }
+
+  .data-table thead th {
+    @apply sticky top-0 z-10 bg-muted/80 text-xs font-semibold uppercase tracking-wide text-muted-foreground backdrop-blur;
+  }
+
+  /* Bootstrap 6 ships a 12-column `.grid` layout class that collides with
+     Tailwind's `.grid` utility. Tailwind's responsive `grid-cols-*` utilities
+     take over from here. */
+  .grid {
+    grid-template-columns: none;
+    grid-template-rows: none;
+  }
+
+  .data-table tbody tr {
+    @apply transition-colors;
+  }
+
+  .data-table tbody tr:hover {
+    background-color: hsl(var(--primary) / 0.04);
+  }
+
+  .hero-panel {
+    position: relative;
+    overflow: hidden;
+    background-image:
+      radial-gradient(30rem 24rem at 15% 10%, hsl(0 0% 100% / 0.22), transparent 60%),
+      linear-gradient(150deg, hsl(var(--primary)) 0%, hsl(var(--accent-foreground)) 100%);
+    color: hsl(var(--primary-foreground));
+  }
+
+  .hero-panel::after {
+    content: "";
+    position: absolute;
+    inset: auto -20% -40% auto;
+    width: 34rem;
+    height: 34rem;
+    border-radius: 999px;
+    border: 1px solid hsl(0 0% 100% / 0.18);
+    box-shadow: 0 0 0 3rem hsl(0 0% 100% / 0.05), 0 0 0 7rem hsl(0 0% 100% / 0.04);
+  }
+
+  .auth-card {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius-card) + 0.25rem);
+    box-shadow: var(--shadow-raised);
+  }
+
+  .dialog-panel {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius-card) + 0.125rem);
+    box-shadow: var(--shadow-raised);
+  }
+
+  .animate-fade-in {
+    animation: wrms-fade-in 160ms ease-out both;
+  }
+
+  .animate-pop-in {
+    animation: wrms-pop-in 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-rise {
+    animation: wrms-rise 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes wrms-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes wrms-pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes wrms-rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Bootstrap component polish layered on the template tokens. */
+  .btn {
+    font-weight: 600;
+    letter-spacing: 0.005em;
+  }
+
+  .btn-solid {
+    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.14), 0 1px 2px hsl(var(--foreground) / 0.1);
+  }
+
+  .btn-solid.theme-primary {
+    background-image: linear-gradient(180deg, hsl(0 0% 100% / 0.14), hsl(0 0% 100% / 0));
+  }
+
+  .btn-outline:hover {
+    background-color: hsl(var(--primary) / 0.06);
+  }
+
+  .btn-link {
+    color: hsl(var(--primary));
+  }
+
+  .form-control,
+  .form-control-sm,
+  .form-control-lg {
+    background-color: hsl(var(--card));
+    border-radius: calc(var(--radius) - 2px);
+    box-shadow: inset 0 1px 2px hsl(var(--foreground) / 0.04);
+  }
+
+  .form-control:focus-visible,
+  .form-control:focus-within {
+    border-color: hsl(var(--ring) / 0.6);
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.18);
+  }
+
+  .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: hsl(var(--foreground));
+    --bs-table-border-color: hsl(var(--border));
+    --bs-table-hover-bg: transparent;
+  }
+
+  .badge {
+    border-radius: var(--radius-pill);
+  }
+
+  .alert {
+    border-radius: var(--radius-card);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--bs-theme-border, hsl(var(--border)));
+    background-color: hsl(var(--card) / 0.7);
+  }
 }
 
 .flatpickr-calendar {
   font-family: var(--font-sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
