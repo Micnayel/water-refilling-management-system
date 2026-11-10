@@ -179,11 +179,32 @@ const scheduleSeed = [
   { customer: 0, staff: 2, type: "refill", recurrence: "weekly", day: 0, time: "08:30", status: "Out for delivery", gallons: 4, amount: 10000 },
   { customer: 1, staff: 4, type: "delivery", recurrence: "one-time", day: 0, time: "10:00", status: "Scheduled", gallons: 2, amount: 5000 },
   { customer: 2, staff: 2, type: "refill", recurrence: "monthly", day: 0, time: "13:30", status: "Completed", gallons: 3, amount: 7500 },
+  { customer: 6, staff: 4, type: "delivery", recurrence: "one-time", day: 0, time: "16:00", status: "Scheduled", gallons: 2, amount: 5000 },
   { customer: 3, staff: 4, type: "delivery", recurrence: "one-time", day: 1, time: "09:15", status: "Scheduled", gallons: 1, amount: 2500 },
   { customer: 4, staff: 2, type: "refill", recurrence: "weekly", day: -1, time: "15:00", status: "Completed", gallons: 5, amount: 12500 },
   { customer: 5, staff: 4, type: "delivery", recurrence: "one-time", day: 2, time: "11:30", status: "Scheduled", gallons: 2, amount: 5000 },
   { customer: 6, staff: 2, type: "refill", recurrence: "monthly", day: -2, time: "08:00", status: "Cancelled", gallons: 4, amount: 10000 },
   { customer: 7, staff: 4, type: "delivery", recurrence: "one-time", day: -1, time: "16:45", status: "Completed", gallons: 3, amount: 7500 },
+  { customer: 1, staff: 2, type: "refill", recurrence: "weekly", day: 3, time: "08:00", status: "Scheduled", gallons: 4, amount: 10000 },
+  { customer: 2, staff: 4, type: "delivery", recurrence: "one-time", day: 4, time: "10:30", status: "Scheduled", gallons: 2, amount: 5000 },
+  { customer: 5, staff: 2, type: "refill", recurrence: "monthly", day: 5, time: "14:00", status: "Scheduled", gallons: 3, amount: 7500 },
+  { customer: 0, staff: 4, type: "delivery", recurrence: "one-time", day: 7, time: "09:00", status: "Scheduled", gallons: 1, amount: 2500 },
+  { customer: 3, staff: 2, type: "refill", recurrence: "weekly", day: 9, time: "11:15", status: "Scheduled", gallons: 5, amount: 12500 },
+  { customer: 7, staff: 4, type: "delivery", recurrence: "one-time", day: 11, time: "15:30", status: "Scheduled", gallons: 2, amount: 5000 },
+  { customer: 4, staff: 2, type: "refill", recurrence: "monthly", day: 13, time: "08:45", status: "Scheduled", gallons: 4, amount: 10000 },
+  { customer: 6, staff: 4, type: "delivery", recurrence: "one-time", day: 15, time: "13:00", status: "Scheduled", gallons: 3, amount: 7500 },
+  { customer: 1, staff: 2, type: "refill", recurrence: "weekly", day: 17, time: "09:30", status: "Scheduled", gallons: 4, amount: 10000 },
+  { customer: 5, staff: 4, type: "delivery", recurrence: "one-time", day: 20, time: "16:15", status: "Scheduled", gallons: 2, amount: 5000 },
+  { customer: 2, staff: 2, type: "refill", recurrence: "weekly", day: -3, time: "10:00", status: "Completed", gallons: 3, amount: 7500 },
+  { customer: 7, staff: 4, type: "delivery", recurrence: "one-time", day: -4, time: "14:30", status: "Completed", gallons: 2, amount: 5000 },
+  { customer: 0, staff: 2, type: "refill", recurrence: "monthly", day: -5, time: "08:15", status: "Completed", gallons: 4, amount: 10000 },
+  { customer: 3, staff: 4, type: "delivery", recurrence: "one-time", day: -6, time: "11:00", status: "Cancelled", gallons: 1, amount: 2500 },
+  { customer: 6, staff: 2, type: "refill", recurrence: "weekly", day: -8, time: "15:45", status: "Completed", gallons: 5, amount: 12500 },
+  { customer: 1, staff: 4, type: "delivery", recurrence: "one-time", day: -10, time: "09:45", status: "Completed", gallons: 2, amount: 5000 },
+  { customer: 4, staff: 2, type: "refill", recurrence: "monthly", day: -12, time: "13:15", status: "Completed", gallons: 3, amount: 7500 },
+  { customer: 5, staff: 4, type: "delivery", recurrence: "one-time", day: -14, time: "10:30", status: "Completed", gallons: 2, amount: 5000 },
+  { customer: 2, staff: 2, type: "refill", recurrence: "weekly", day: -16, time: "08:30", status: "Completed", gallons: 4, amount: 10000 },
+  { customer: 7, staff: 4, type: "delivery", recurrence: "one-time", day: -18, time: "16:00", status: "Completed", gallons: 1, amount: 2500 },
 ];
 
 const scheduleItems = scheduleSeed.map((entry, index) => {
@@ -376,9 +397,14 @@ export function previewResponse(path: string, method: string, body: unknown): un
   if (method === "POST" && pathname === "/schedules/query") {
     const status = text(input.status);
     const date = text(input.date);
+    const from = text(input.from);
+    const to = text(input.to);
     const filtered = scheduleItems.filter(
       (schedule) =>
-        (!status || schedule.status === status) && (!date || schedule.scheduledDate === date),
+        (!status || schedule.status === status) &&
+        (!date || schedule.scheduledDate === date) &&
+        (!from || schedule.scheduledDate >= from) &&
+        (!to || schedule.scheduledDate <= to),
     );
     return page(filtered, input);
   }

@@ -12,6 +12,8 @@ export function querySchedules(input: {
   pageSize: number;
   status?: string;
   date?: string;
+  from?: string;
+  to?: string;
 }): Promise<{ items: Schedule[]; nextCursor: string | null }> {
   return apiRequest("/schedules/query", {
     method: "POST",

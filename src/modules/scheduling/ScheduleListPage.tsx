@@ -1,41 +1,67 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Badge, statusTone } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { NativeSelect } from "@/components/ui/card";
-import { DatePicker } from "@/components/ui/date-picker";
 import { PageHeader } from "@/components/ui/page-header";
-import { Pagination } from "@/components/ui/pagination";
-import { SkeletonRows } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-  TableWrap,
-} from "@/components/ui/table";
 import { useToast } from "@/components/ui/toaster";
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "@/components/ui/icons";
 import { apiMessage } from "@/lib/api-client";
+import { todayIso } from "@/lib/dates";
 import { downloadFile } from "@/lib/download";
-import { formatDateNumeric, formatTime } from "@/lib/dates";
-import { formatCentavos, formatNumber } from "@/lib/money";
 import { usePermission } from "@/hooks/use-permission";
-import { useScheduleList } from "./hooks";
-import { SCHEDULE_STATUSES } from "./schemas";
+import {
+  buildMonthGrid,
+  formatDayLabel,
+  formatMonthLabel,
+  monthRange,
+  shiftMonth,
+} from "./calendar";
+import { useScheduleCalendar } from "./hooks";
+import { ScheduleCalendar } from "./ScheduleCalendar";
+import { ScheduleDayDialog } from "./ScheduleDayDialog";
+import { SCHEDULE_STATUSES, type Schedule } from "./schemas";
+
+function groupByDate(items: Schedule[]): Map<string, Schedule[]> {
+  const groups = new Map<string, Schedule[]>();
+  for (const schedule of items) {
+    const list = groups.get(schedule.scheduledDate) ?? [];
+    list.push(schedule);
+    groups.set(schedule.scheduledDate, list);
+  }
+  for (const list of groups.values()) {
+    list.sort((left, right) => left.scheduledTime.localeCompare(right.scheduledTime));
+  }
+  return groups;
+}
 
 export function ScheduleListPage() {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const now = new Date();
+  const [month, setMonth] = useState({ year: now.getFullYear(), month: now.getMonth() });
   const [status, setStatus] = useState("");
-  const [date, setDate] = useState("");
-  const query = useScheduleList(page, pageSize, status, date);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const navigate = useNavigate();
   const toast = useToast();
   const canAdd = usePermission("scheduling:add");
   const canExport = usePermission("scheduling:export");
+
+  const days = useMemo(() => buildMonthGrid(month.year, month.month), [month]);
+  const range = useMemo(() => monthRange(month.year, month.month), [month]);
+  const query = useScheduleCalendar(range.from, range.to, status);
+  const schedulesByDate = useMemo(() => groupByDate(query.data?.items ?? []), [query.data]);
+  const today = todayIso();
+  const total = query.data?.items.length ?? 0;
+  const selectedSchedules = selectedDate ? schedulesByDate.get(selectedDate) ?? [] : [];
+
+  const changeMonth = (delta: number) =>
+    setMonth((current) => shiftMonth(current.year, current.month, delta));
+
+  const goToToday = () => {
+    const date = new Date();
+    setMonth({ year: date.getFullYear(), month: date.getMonth() });
+    setSelectedDate(todayIso());
+  };
 
   const exportCsv = async () => {
     try {
@@ -50,7 +76,7 @@ export function ScheduleListPage() {
     <div className="space-y-3">
       <PageHeader
         title="Scheduling"
-        description="Refill and delivery schedules. Completing one posts the stock movement and sale together."
+        description="Refill and delivery schedules in a month view. Select a date to see every schedule for that day."
         actions={
           <>
             {canExport ? (
@@ -58,128 +84,106 @@ export function ScheduleListPage() {
                 Export
               </Button>
             ) : null}
-            {canAdd ? <Button onClick={() => navigate("/scheduling/new")}>New schedule</Button> : null}
+            {canAdd ? (
+              <Button onClick={() => navigate("/scheduling/new")}>
+                <PlusIcon /> New schedule
+              </Button>
+            ) : null}
           </>
         }
       />
 
-      <div className="toolbar-surface flex flex-wrap items-end gap-2">
-        <div className="w-40">
-          <label htmlFor="schedule-status" className="text-xs font-medium text-muted-foreground">
-            Status
-          </label>
-          <NativeSelect
-            id="schedule-status"
-            value={status}
-            onChange={(event) => {
-              setStatus(event.target.value);
-              setPage(1);
-            }}
-          >
-            <option value="">All statuses</option>
-            {SCHEDULE_STATUSES.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </NativeSelect>
-        </div>
-        <div className="w-40">
-          <label htmlFor="schedule-date" className="text-xs font-medium text-muted-foreground">
-            Date
-          </label>
-          <DatePicker
-            id="schedule-date"
-            value={date}
-            onChange={(value) => {
-              setDate(value);
-              setPage(1);
-            }}
-          />
-        </div>
-        {date ? (
-          <Button variant="outline" onClick={() => setDate("")}>
-            Clear date
+      <div className="toolbar-surface flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-1">
+          <Button variant="outline" size="icon" aria-label="Previous month" onClick={() => changeMonth(-1)}>
+            <ChevronLeftIcon />
           </Button>
-        ) : null}
+          <Button variant="outline" size="icon" aria-label="Next month" onClick={() => changeMonth(1)}>
+            <ChevronRightIcon />
+          </Button>
+          <Button variant="outline" size="sm" onClick={goToToday}>
+            Today
+          </Button>
+        </div>
+
+        <div className="min-w-0">
+          <h2 className="truncate text-base font-semibold">{formatMonthLabel(month.year, month.month)}</h2>
+          <p className="text-xs text-muted-foreground">
+            {query.isLoading ? "Loading schedules…" : `${total} ${total === 1 ? "schedule" : "schedules"} in view`}
+          </p>
+        </div>
+
+        <div className="ml-auto flex items-end gap-2">
+          <div className="w-40">
+            <label htmlFor="schedule-status" className="text-xs font-medium text-muted-foreground">
+              Status
+            </label>
+            <NativeSelect
+              id="schedule-status"
+              value={status}
+              onChange={(event) => setStatus(event.target.value)}
+            >
+              <option value="">All statuses</option>
+              {SCHEDULE_STATUSES.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </NativeSelect>
+          </div>
+        </div>
       </div>
 
-      <div className="card-surface overflow-hidden">
-        {query.isLoading ? (
-          <div className="p-3">
-            <SkeletonRows rows={6} />
-          </div>
-        ) : query.isError ? (
+      {query.isError ? (
+        <div className="card-surface">
           <ErrorState
             description={apiMessage(query.error)}
             action={<Button variant="outline" onClick={() => void query.refetch()}>Try again</Button>}
           />
-        ) : query.data && query.data.items.length === 0 ? (
-          <EmptyState
-            title="No schedules found"
-            description="Adjust the filters, or create a schedule."
-            action={canAdd ? <Button onClick={() => navigate("/scheduling/new")}>New schedule</Button> : undefined}
+        </div>
+      ) : query.isLoading ? (
+        <div className="card-surface p-3">
+          <Skeleton className="h-[28rem] w-full" />
+        </div>
+      ) : (
+        <>
+          <ScheduleCalendar
+            days={days}
+            schedulesByDate={schedulesByDate}
+            today={today}
+            onSelectDay={setSelectedDate}
           />
-        ) : (
-          <>
-            <TableWrap>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableHeaderCell>Date</TableHeaderCell>
-                    <TableHeaderCell>Time</TableHeaderCell>
-                    <TableHeaderCell>Customer</TableHeaderCell>
-                    <TableHeaderCell>Assigned</TableHeaderCell>
-                    <TableHeaderCell>Type</TableHeaderCell>
-                    <TableHeaderCell className="text-right">Gallons</TableHeaderCell>
-                    <TableHeaderCell className="text-right">Amount</TableHeaderCell>
-                    <TableHeaderCell>Status</TableHeaderCell>
-                    <TableHeaderCell className="text-right">Actions</TableHeaderCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {query.data?.items.map((schedule) => (
-                    <TableRow key={schedule.id}>
-                      <TableCell className="whitespace-nowrap">{formatDateNumeric(schedule.scheduledDate)}</TableCell>
-                      <TableCell className="whitespace-nowrap">{formatTime(schedule.scheduledTime)}</TableCell>
-                      <TableCell>
-                        <span className="font-medium">{schedule.customerName}</span>
-                        <span className="block text-xs text-muted-foreground">{schedule.customerCode}</span>
-                      </TableCell>
-                      <TableCell>{schedule.assignedUserName}</TableCell>
-                      <TableCell className="capitalize">{schedule.type}</TableCell>
-                      <TableCell className="text-right">{formatNumber(schedule.gallons)}</TableCell>
-                      <TableCell className="text-right">{formatCentavos(schedule.amountCentavos)}</TableCell>
-                      <TableCell>
-                        <Badge tone={statusTone(schedule.status)}>{schedule.status}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Link
-                          to={`/scheduling/${schedule.id}`}
-                          className={buttonVariants({ variant: "ghost", size: "sm" })}
-                        >
-                          View
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableWrap>
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              itemCount={query.data?.items.length ?? 0}
-              hasNext={Boolean(query.data?.nextCursor)}
-              onPageChange={setPage}
-              onPageSizeChange={(size) => {
-                setPageSize(size);
-                setPage(1);
-              }}
-            />
-          </>
-        )}
-      </div>
+          {total === 0 ? (
+            <div className="card-surface">
+              <EmptyState
+                title="No schedules in this view"
+                description="Choose another month or status, or create a refill or delivery schedule."
+                action={
+                  canAdd ? (
+                    <Button onClick={() => navigate("/scheduling/new")}>
+                      <PlusIcon /> New schedule
+                    </Button>
+                  ) : undefined
+                }
+              />
+            </div>
+          ) : null}
+        </>
+      )}
+
+      <ScheduleDayDialog
+        open={selectedDate !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedDate(null);
+        }}
+        dateLabel={selectedDate ? formatDayLabel(selectedDate) : ""}
+        schedules={selectedSchedules}
+        canAdd={canAdd}
+        onCreate={() => {
+          setSelectedDate(null);
+          navigate("/scheduling/new");
+        }}
+      />
     </div>
   );
 }

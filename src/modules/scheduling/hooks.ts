@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { ScheduleFormValues } from "./schemas";
+import type { Schedule, ScheduleFormValues } from "./schemas";
 import * as service from "./service";
 
 export const scheduleKeys = {
@@ -8,22 +8,27 @@ export const scheduleKeys = {
   assignees: ["schedules", "assignees"] as const,
 };
 
-export function useScheduleList(
-  page: number,
-  pageSize: number,
-  status: string,
-  date: string,
-) {
-  const cursor = page <= 1 ? undefined : String((page - 1) * pageSize);
+export function useScheduleCalendar(from: string, to: string, status: string) {
   return useQuery({
-    queryKey: [...scheduleKeys.list, cursor ?? "start", pageSize, status, date],
-    queryFn: () =>
-      service.querySchedules({
-        cursor,
-        pageSize,
-        status: status || undefined,
-        date: date || undefined,
-      }),
+    queryKey: [...scheduleKeys.list, "calendar", from, to, status],
+    queryFn: async () => {
+      const items: Schedule[] = [];
+      let cursor: string | undefined;
+      // A month can exceed one page; walk every page so the calendar is complete.
+      for (let page = 0; page < 10; page += 1) {
+        const result = await service.querySchedules({
+          cursor,
+          pageSize: 100,
+          status: status || undefined,
+          from,
+          to,
+        });
+        items.push(...result.items);
+        if (!result.nextCursor) break;
+        cursor = result.nextCursor;
+      }
+      return { items };
+    },
     placeholderData: (previous) => previous,
   });
 }

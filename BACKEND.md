@@ -90,7 +90,7 @@ All paths are relative to `/api/v1` unless noted.
 | POST | `/customers/:id/restore` | `customers:delete` | Lifecycle restore. |
 | POST | `/customers/geocode` | `customers:add` | Server-side geocoding. |
 | GET | `/customers/export` | `customers:export` | Audited CSV export. |
-| POST | `/schedules/query` | `scheduling:view` | Paged schedules. |
+| POST | `/schedules/query` | `scheduling:view` | Paged schedules; optional `status`, `date`, or `from`/`to` date range. |
 | GET | `/schedules/assignees` | `scheduling:view` | Assignable active staff. |
 | GET | `/schedules/:id` | `scheduling:view` | Schedule detail. |
 | POST | `/schedules` | `scheduling:add` | One-time or recurring schedule. |

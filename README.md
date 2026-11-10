@@ -64,10 +64,11 @@ The router exposes workspaces rather than a forced screen sequence, but records 
 
 ### Scheduling
 
-1. A user creates a one-time or recurring refill or delivery schedule for a customer and assigns a staff member.
-2. The schedule moves through Scheduled, Out for delivery, Completed, or Cancelled using the status stepper.
-3. Completing a schedule, in one server transaction, posts the stock movement and records the sale in centavos.
-4. Cancelling is allowed only before completion.
+1. The Scheduling page shows a month calendar; selecting a date opens a modal with every schedule for that day.
+2. A user creates a one-time or recurring refill or delivery schedule for a customer and assigns a staff member.
+3. The schedule moves through Scheduled, Out for delivery, Completed, or Cancelled using the status stepper.
+4. Completing a schedule, in one server transaction, posts the stock movement and records the sale in centavos.
+5. Cancelling is allowed only before completion.
 
 ### User Management
 
@@ -367,7 +368,7 @@ Page
 #### Scheduling
 
 - Route and API: `/scheduling` and `backend/src/modules/scheduling/routes.ts`.
-- Rules: One-time or recurring refill and delivery schedules with an assigned staff member, in Asia/Manila time. Lifecycle is Scheduled, Out for delivery, Completed, Cancelled. Completing a schedule posts the stock movement and the sale in one server transaction; cancelling is allowed only before completion.
+- Rules: One-time or recurring refill and delivery schedules with an assigned staff member, in Asia/Manila time. The list renders a month calendar backed by a `from`/`to` date range query; selecting a date opens a modal with that day's schedules. Lifecycle is Scheduled, Out for delivery, Completed, Cancelled. Completing a schedule posts the stock movement and the sale in one server transaction; cancelling is allowed only before completion.
 - Audit events: `SCHEDULE_CREATE`, `SCHEDULE_UPDATE`, `SCHEDULE_DELETE`, `SCHEDULE_EXPORT`.
 
 #### User Management

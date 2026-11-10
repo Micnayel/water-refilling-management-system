@@ -1,4 +1,4 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
 import type { Database } from "../../db/client";
 import { customers, inventoryItems, sales, schedules, users } from "../../db/schema";
 import { newId } from "../../lib/crypto";
@@ -70,13 +70,22 @@ export async function findSchedule(db: Executor, id: string): Promise<PublicSche
 
 export async function querySchedules(
   db: Database,
-  input: { cursor?: string; pageSize?: number; status?: string; date?: string },
+  input: {
+    cursor?: string;
+    pageSize?: number;
+    status?: string;
+    date?: string;
+    from?: string;
+    to?: string;
+  },
 ): Promise<Page<PublicSchedule>> {
   const offset = decodeCursor(input.cursor);
   const pageSize = input.pageSize ?? 20;
   const filters = [];
   if (input.status) filters.push(eq(schedules.status, input.status));
   if (input.date) filters.push(eq(schedules.scheduledDate, input.date));
+  if (input.from) filters.push(gte(schedules.scheduledDate, input.from));
+  if (input.to) filters.push(lte(schedules.scheduledDate, input.to));
 
   const rows = await db
     .select({ schedule: schedules, customer: customers, assigned: users })

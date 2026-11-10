@@ -25,9 +25,16 @@ export const scheduleStatusSchema = z.object({
   itemId: z.string().uuid().optional(),
 });
 
-export const querySchedulesSchema = z.object({
-  cursor: z.string().optional(),
-  pageSize: z.number().int().min(1).max(100).optional(),
-  status: z.enum(["Scheduled", "Out for delivery", "Completed", "Cancelled"]).optional(),
-  date: isoDate.optional(),
-});
+export const querySchedulesSchema = z
+  .object({
+    cursor: z.string().optional(),
+    pageSize: z.number().int().min(1).max(100).optional(),
+    status: z.enum(["Scheduled", "Out for delivery", "Completed", "Cancelled"]).optional(),
+    date: isoDate.optional(),
+    from: isoDate.optional(),
+    to: isoDate.optional(),
+  })
+  .refine((input) => !input.from || !input.to || input.from <= input.to, {
+    message: "The start date must be before the end date.",
+    path: ["from"],
+  });
