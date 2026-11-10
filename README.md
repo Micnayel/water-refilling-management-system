@@ -121,6 +121,10 @@ Local development uses one ignored `backend/.env` for the API and Vite. Vite rea
 - Local seed accounts and records are synthetic and must never contain real personal data.
 - The client calls relative `/api/v1` paths and sends secure session cookies with `credentials: "include"`.
 
+### Preview data
+
+Set `VITE_PREVIEW_DATA=true` when building (or running `npm run dev`) to render synthetic records in every module for design review without touching the database. Preview mode is read-only: only `:view` grants are honoured, so create, edit, delete, export, reveal, and approval controls stay hidden and a "Preview data" banner appears. Fixtures live in `src/lib/preview-data.ts` and are parsed through the same Zod schemas as the API responses. Never enable preview mode against a database that should not be touched, and never copy fixture values into production records.
+
 ### Google Maps configuration
 
 - `VITE_GOOGLE_MAPS_API_KEY` is the browser key for the Dashboard map and Heat Map. It is public by design, so restrict it by HTTP referrer and to the Maps JavaScript API only. It is the only `VITE_` key that is not the API proxy target.
@@ -375,7 +379,7 @@ Page
 #### Settings
 
 - Route and API: `/settings` and `backend/src/modules/settings/routes.ts`.
-- Rules: Any signed-in user may read and change their own template. Templates are named presets in `src/config/` that only swap design-token values. The choice is stored per user through the API and cached in the client preferences store; it contains no sensitive data. System-wide settings require `settings:edit`.
+- Rules: Any signed-in user may read and change their own template. Templates are named presets in `src/config/` that only swap design-token values. The default is Vision Glass (deep navy glass with a green-to-teal gradient); Aqua Light keeps the original light palette, followed by Deep Ocean, Warm Sunrise, Forest Spring, and Midnight. Changes to `data-theme` are local only, and templates never hardcode colors in components. The choice is stored per user through the API and cached in the client preferences store; it contains no sensitive data. System-wide settings require `settings:edit`.
 - Audit events: `SETTINGS_UPDATE`.
 
 ## Security and sensitive-data rules

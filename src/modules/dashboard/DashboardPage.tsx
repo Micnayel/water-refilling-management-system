@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Alert } from "@/components/ui/alert";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
-import { PageHeader } from "@/components/ui/page-header";
 import {
   ArrowRightIcon,
   DropletIcon,
+  MapIcon,
   MapPinIcon,
   PackageIcon,
   TrendingUpIcon,
@@ -22,8 +23,10 @@ import { BaseMap } from "@/components/maps";
 import { MaskedValue } from "@/components/privacy/masked-value";
 import { useToast } from "@/components/ui/toaster";
 import { apiMessage } from "@/lib/api-client";
+import { formatDateNumeric, todayIso } from "@/lib/dates";
 import { formatCentavos, formatNumber } from "@/lib/money";
 import { usePermission } from "@/hooks/use-permission";
+import { useSessionStore } from "@/stores/session-store";
 import { queryCustomers } from "@/modules/customers";
 import { useDashboardMap, useDashboardSummary, useRevealDashboardCustomer } from "./hooks";
 
@@ -32,6 +35,7 @@ export function DashboardPage() {
   const map = useDashboardMap();
   const reveal = useRevealDashboardCustomer();
   const toast = useToast();
+  const user = useSessionStore((state) => state.user);
   const canReveal = usePermission("customers:reveal");
   const canViewCustomers = usePermission("customers:view");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -63,11 +67,11 @@ export function DashboardPage() {
 
   if (summary.isLoading) {
     return (
-      <div className="space-y-3">
-        <PageHeader title="Dashboard" description="Aggregated from the API. No raw customer rows." />
+      <div className="space-y-4">
+        <Skeleton className="h-40 w-full" />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (
-            <Skeleton key={index} className="h-24 w-full" />
+            <Skeleton key={index} className="h-28 w-full" />
           ))}
         </div>
         <SkeletonRows rows={5} />
@@ -85,6 +89,7 @@ export function DashboardPage() {
   }
 
   const data = summary.data;
+  const firstName = user?.fullName.split(" ")[0] ?? "there";
   const cards = [
     {
       label: "Sales today",
@@ -92,13 +97,15 @@ export function DashboardPage() {
       hint: `${formatNumber(data.salesTodayCount)} completed today`,
       to: "/reports",
       icon: WalletIcon,
+      tone: "stat-icon--1",
     },
     {
       label: "Clients",
       value: formatNumber(data.clientCount),
-      hint: `${data.clientLocationStats.length} areas`,
+      hint: `${data.clientLocationStats.length} areas covered`,
       to: "/customers",
       icon: UsersIcon,
+      tone: "stat-icon--2",
     },
     {
       label: "Full gallons",
@@ -106,6 +113,7 @@ export function DashboardPage() {
       hint: `${formatNumber(data.inventoryWithCustomer)} with customers`,
       to: "/inventory",
       icon: PackageIcon,
+      tone: "stat-icon--3",
     },
     {
       label: "Low stock items",
@@ -113,48 +121,85 @@ export function DashboardPage() {
       hint: data.lowStockCount > 0 ? "Needs attention" : "All above reorder level",
       to: "/inventory",
       icon: TrendingUpIcon,
+      tone: "stat-icon--4",
     },
   ];
   const maxAreaCount = Math.max(1, ...data.clientLocationStats.map((stat) => stat.count));
+  const totalGallons = Math.max(1, data.inventoryFull + data.inventoryWithCustomer);
+  const stationShare = data.inventoryFull / totalGallons;
+  const customerShare = data.inventoryWithCustomer / totalGallons;
 
   return (
-    <div className="animate-rise space-y-3">
-      <PageHeader
-        title="Dashboard"
-        description="Sales, clients, locations, and inventory from aggregated API responses."
-        actions={
-          canReveal ? (
-            <Button variant="outline" onClick={() => setDialogOpen(true)}>
-              <MapPinIcon /> Reveal exact location
-            </Button>
-          ) : null
-        }
-      />
+    <div className="animate-rise space-y-4">
+      <section className="hero-banner">
+        <div className="relative z-10 flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-xl">
+            <span className="hero-chip">
+              <DropletIcon className="size-3" />
+              Station overview · {formatDateNumeric(todayIso())}
+            </span>
+            <h1 className="mt-3 text-2xl font-bold leading-tight tracking-tight sm:text-[1.75rem]">
+              Welcome back, {firstName}.
+            </h1>
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/75">
+              {formatNumber(data.clientCount)} clients, {formatNumber(data.inventoryFull)} full gallons,
+              and {formatNumber(data.salesTodayCount)} completed sales today. Everything here comes
+              from aggregated API responses.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link to="/reports" className="hero-action hero-action--solid">
+                <WalletIcon className="size-3.5" /> Sales report
+              </Link>
+              <Link to="/heat-map" className="hero-action">
+                <MapIcon className="size-3.5" /> Heat map
+              </Link>
+              <Link to="/scheduling" className="hero-action">
+                <ArrowRightIcon className="size-3.5" /> Scheduling
+              </Link>
+            </div>
+          </div>
+
+          <dl className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:min-w-[22rem]">
+            {[
+              { label: "Month sales", value: formatCentavos(data.salesMonthCentavos) },
+              { label: "Month orders", value: formatNumber(data.salesMonthCount) },
+              { label: "Areas", value: formatNumber(data.clientLocationStats.length) },
+            ].map((entry) => (
+              <div key={entry.label} className="rounded-xl border border-white/15 bg-white/10 px-3 py-2">
+                <dt className="text-[0.625rem] uppercase tracking-[0.12em] text-white/65">{entry.label}</dt>
+                <dd className="mt-0.5 truncate text-base font-semibold tabular-nums text-white">{entry.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => {
           const Icon = card.icon;
           return (
             <Card key={card.label} className="stat-card">
-              <CardContent className="flex items-start gap-3 p-3">
-                <span className="stat-icon">
-                  <Icon className="size-4" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[0.6875rem] font-medium uppercase tracking-wider text-muted-foreground">
-                    {card.label}
-                  </p>
-                  <p className="mt-0.5 text-2xl font-semibold tabular-nums tracking-tight">{card.value}</p>
-                  <div className="mt-1 flex items-center justify-between gap-2">
-                    <p className="truncate text-xs text-muted-foreground">{card.hint}</p>
-                    <Link
-                      to={card.to}
-                      aria-label={`Open ${card.label}`}
-                      className="flex size-6 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
-                    >
-                      <ArrowRightIcon className="size-3.5" />
-                    </Link>
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[0.625rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      {card.label}
+                    </p>
+                    <p className="mt-1 truncate text-2xl font-bold tabular-nums tracking-tight">{card.value}</p>
                   </div>
+                  <span className={`stat-icon ${card.tone}`}>
+                    <Icon className="size-4" />
+                  </span>
+                </div>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <p className="truncate text-xs text-muted-foreground">{card.hint}</p>
+                  <Link
+                    to={card.to}
+                    aria-label={`Open ${card.label}`}
+                    className="flex size-6 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                  >
+                    <ArrowRightIcon className="size-3.5" />
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -162,60 +207,108 @@ export function DashboardPage() {
         })}
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="flex-row items-center justify-between gap-2">
+      <div className="grid gap-3 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex-row items-start justify-between gap-2">
             <div>
-              <CardTitle className="flex items-center gap-1.5">
-                <MapPinIcon className="size-4 text-primary" /> Customer locations
-              </CardTitle>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Pins are grouped by barangay and rounded. Exact locations need an audited reveal.
+              <CardTitle className="text-base">Clients by area</CardTitle>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Aggregated per barangay. No individual addresses or coordinates.
               </p>
             </div>
+            <Badge tone="primary">{formatNumber(data.clientCount)} clients</Badge>
           </CardHeader>
-          <CardContent>
-            {map.isError ? (
-              <ErrorState description={apiMessage(map.error)} />
-            ) : (
-              <div className="overflow-hidden rounded-lg border border-border">
-                <BaseMap points={map.data?.points ?? []} height="18rem" ariaLabel="Masked customer location map" />
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex-row items-center justify-between gap-2">
-            <div>
-              <CardTitle className="flex items-center gap-1.5">
-                <DropletIcon className="size-4 text-primary" /> Clients by area
-              </CardTitle>
-              <p className="mt-1 text-xs text-muted-foreground">Non-map alternative with the same data.</p>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-3 pt-0">
             {data.clientLocationStats.length === 0 ? (
               <EmptyState title="No client locations yet" />
             ) : (
-              <ul className="divide-y divide-border">
-                {data.clientLocationStats.map((stat) => (
-                  <li key={stat.area} className="flex items-center gap-3 px-3 py-2 text-sm">
-                    <span className="w-32 truncate sm:w-40">{stat.area}</span>
-                    <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                      <span
-                        className="block h-full rounded-full bg-primary"
-                        style={{ width: `${Math.max(6, (stat.count / maxAreaCount) * 100)}%` }}
-                      />
+              <ul className="space-y-2.5">
+                {data.clientLocationStats.map((stat, index) => (
+                  <li key={stat.area} className="flex items-center gap-3">
+                    <span className="w-28 shrink-0 truncate text-xs font-medium sm:w-36">{stat.area}</span>
+                    <span className={`metric-bar metric-bar--${(index % 4) + 1} flex-1`}>
+                      <span style={{ width: `${Math.max(6, (stat.count / maxAreaCount) * 100)}%` }} />
                     </span>
-                    <span className="w-8 text-right font-medium tabular-nums">{formatNumber(stat.count)}</span>
+                    <span className="w-9 shrink-0 text-right text-xs font-semibold tabular-nums">
+                      {formatNumber(stat.count)}
+                    </span>
                   </li>
                 ))}
               </ul>
             )}
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Inventory health</CardTitle>
+            <p className="text-xs text-muted-foreground">Full stock vs. gallons with customers.</p>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center gap-4 p-3 pt-0">
+            <div
+              className="donut"
+              role="img"
+              aria-label={`${Math.round(stationShare * 100)} percent of tracked gallons are full at the station`}
+              style={
+                {
+                  "--donut-full": `${stationShare}turn`,
+                  "--donut-used": "1turn",
+                } as CSSProperties
+              }
+            >
+              <span className="donut-center">
+                <span className="text-lg font-bold tabular-nums">{Math.round(stationShare * 100)}%</span>
+                <span className="text-[0.625rem] uppercase tracking-wider text-muted-foreground">at station</span>
+              </span>
+            </div>
+            <ul className="w-full space-y-1.5 text-xs">
+              <li className="flex items-center gap-2">
+                <span className="size-2 rounded-full bg-[var(--chart-1)]" aria-hidden="true" />
+                <span className="flex-1 text-muted-foreground">Full gallons</span>
+                <span className="font-semibold tabular-nums">{formatNumber(data.inventoryFull)}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="size-2 rounded-full bg-[var(--chart-2)]" aria-hidden="true" />
+                <span className="flex-1 text-muted-foreground">With customers</span>
+                <span className="font-semibold tabular-nums">{formatNumber(data.inventoryWithCustomer)}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="size-2 rounded-full bg-[var(--chart-3)]" aria-hidden="true" />
+                <span className="flex-1 text-muted-foreground">Low stock items</span>
+                <span className="font-semibold tabular-nums">{formatNumber(data.lowStockCount)}</span>
+              </li>
+            </ul>
+            <p className="w-full text-[0.625rem] text-muted-foreground">
+              {Math.round(customerShare * 100)}% of tracked gallons are out with customers.
+            </p>
+          </CardContent>
+        </Card>
       </div>
+
+      <Card>
+        <CardHeader className="flex-row items-start justify-between gap-2">
+          <div>
+            <CardTitle className="flex items-center gap-1.5 text-base">
+              <MapPinIcon className="size-4 text-primary" /> Customer locations
+            </CardTitle>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Pins are grouped by barangay and rounded. Exact locations need an audited reveal.
+            </p>
+          </div>
+          <Link to="/heat-map" className="hero-action hero-action--solid">
+            <MapIcon className="size-3.5" /> Open heat map
+          </Link>
+        </CardHeader>
+        <CardContent>
+          {map.isError ? (
+            <ErrorState description={apiMessage(map.error)} />
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-white/10">
+              <BaseMap points={map.data?.points ?? []} height="21rem" ariaLabel="Masked customer location map" />
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {revealed ? (
         <Card>
@@ -258,17 +351,13 @@ export function DashboardPage() {
         </Card>
       ) : null}
 
-      <div className="flex flex-wrap gap-2 text-xs">
-        <Link to="/heat-map" className={buttonVariants({ variant: "outline", size: "sm" })}>
-          Open heat map
-        </Link>
-        <Link to="/scheduling" className={buttonVariants({ variant: "outline", size: "sm" })}>
-          Open scheduling
-        </Link>
-        <Link to="/reports" className={buttonVariants({ variant: "outline", size: "sm" })}>
-          Open reports
-        </Link>
-      </div>
+      {canReveal ? (
+        <div className="flex justify-end">
+          <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)}>
+            <MapPinIcon /> Reveal exact location
+          </Button>
+        </div>
+      ) : null}
 
       <Dialog
         open={dialogOpen}

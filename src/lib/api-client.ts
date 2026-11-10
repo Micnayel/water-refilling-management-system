@@ -1,4 +1,6 @@
 import type { ZodType } from "zod";
+import { isPreviewMode } from "@/lib/preview";
+import { previewResponse } from "@/lib/preview-data";
 
 const API_BASE = "/api/v1";
 
@@ -36,6 +38,15 @@ function isNotFound(path: string): boolean {
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions<T> = {}): Promise<T> {
+  const method = options.method ?? (options.body === undefined ? "GET" : "POST");
+
+  if (isPreviewMode()) {
+    const preview = previewResponse(path, method, options.body);
+    if (preview !== undefined) {
+      return options.schema ? options.schema.parse(preview) : (preview as T);
+    }
+  }
+
   const headers: Record<string, string> = { accept: "application/json" };
   if (options.body !== undefined) headers["content-type"] = "application/json";
   if (csrfToken) headers["x-csrf-token"] = csrfToken;
@@ -43,7 +54,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions<T> = {
   let response: Response;
   try {
     response = await fetch(`${API_BASE}${path}`, {
-      method: options.method ?? (options.body === undefined ? "GET" : "POST"),
+      method,
       credentials: "include",
       headers,
       body: options.body === undefined ? undefined : JSON.stringify(options.body),

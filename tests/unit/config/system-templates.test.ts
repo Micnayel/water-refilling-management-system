@@ -8,7 +8,7 @@ describe("system templates", () => {
 
   it("includes every documented template", () => {
     const ids = SYSTEM_TEMPLATES.map((template) => template.id);
-    expect(ids).toEqual(["default", "ocean", "sunrise", "forest", "midnight"]);
+    expect(ids).toEqual(["default", "aqua", "ocean", "sunrise", "forest", "midnight"]);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -20,6 +20,19 @@ describe("system templates", () => {
   it("applies the selected template to the document", () => {
     applyTemplate("midnight");
     expect(document.documentElement.dataset.theme).toBe("midnight");
+    expect(document.documentElement.dataset.bsTheme).toBe("dark");
+  });
+
+  it("uses the dark Vision palette as the default", () => {
+    applyTemplate("default");
+    expect(document.documentElement.dataset.theme).toBe("default");
+    expect(document.documentElement.dataset.bsTheme).toBe("dark");
+    expect(DEFAULT_TEMPLATE_ID).toBe("default");
+  });
+
+  it("keeps the light template on a light Bootstrap scheme", () => {
+    applyTemplate("aqua");
+    expect(document.documentElement.dataset.bsTheme).toBe("light");
   });
 
   it("falls back to the default template for unknown ids", () => {
@@ -29,6 +42,6 @@ describe("system templates", () => {
 
   it("returns a readable template name", () => {
     expect(templateName("forest")).toBe("Forest Spring");
-    expect(templateName("neon")).toBe("Aqua Default");
+    expect(templateName("neon")).toBe("Vision Glass");
   });
 });

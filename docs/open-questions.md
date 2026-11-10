@@ -25,4 +25,5 @@ Unsettled policies and decisions for the Water Refilling Management System. Reco
 | --- | --- | --- | --- |
 | 1 | Heat Map uses grid-bucketed circle overlays (`google.maps.Circle`) supplied by the shared map wrapper. The deprecated Google Maps heat layer is not used. | 2026-11-07 | Implementation |
 | 6 | Heat Map buckets smaller than three customers are suppressed, and the API returns only aggregated barangay cells with counts. Exact threshold remains subject to compliance review. | 2026-11-07 | Implementation |
-| 10 | Five visual-only templates ship at launch: Aqua Default, Deep Ocean, Warm Sunrise, Forest Spring, and Midnight. Templates swap design tokens only. | 2026-11-07 | Implementation |
+| 10 | Six visual-only templates ship: Vision Glass (default, deep navy glass with a green-to-teal gradient), Aqua Light, Deep Ocean, Warm Sunrise, Forest Spring, and Midnight. Templates swap design tokens only. | 2026-11-10 | Implementation |
+| 16 | Preview data is gated by `VITE_PREVIEW_DATA=true` at build time and served from frontend fixtures through `src/lib/api-client.ts`. Preview mode is read-only and never seeds the database. | 2026-11-10 | Implementation |

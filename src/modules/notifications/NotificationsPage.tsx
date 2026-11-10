@@ -7,6 +7,7 @@ import { EmptyState, ErrorState } from "@/components/ui/states";
 import { useToast } from "@/components/ui/toaster";
 import { apiMessage } from "@/lib/api-client";
 import { formatDateTime } from "@/lib/dates";
+import { isPreviewMode } from "@/lib/preview";
 import { BellIcon } from "@/components/ui/icons";
 import { useMarkNotificationRead, useNotifications } from "./hooks";
 
@@ -14,6 +15,7 @@ export function NotificationsPage() {
   const query = useNotifications();
   const markRead = useMarkNotificationRead();
   const toast = useToast();
+  const preview = isPreviewMode();
 
   const onMarkRead = async (id: string) => {
     try {
@@ -74,7 +76,7 @@ export function NotificationsPage() {
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                       <Badge tone={unread ? "primary" : "neutral"}>{notification.kind}</Badge>
-                      {unread ? (
+                      {unread && !preview ? (
                         <Button
                           variant="outline"
                           size="sm"

@@ -19,6 +19,7 @@ import {
 import { useToast } from "@/components/ui/toaster";
 import { apiMessage } from "@/lib/api-client";
 import { formatDateNumeric } from "@/lib/dates";
+import { usePermission } from "@/hooks/use-permission";
 import { GrantPicker } from "./GrantPicker";
 import { useApproveUser, usePendingUsers, useRejectUser, useRoles } from "./hooks";
 
@@ -33,6 +34,7 @@ export function PendingRegistrationsPage() {
   const approve = useApproveUser();
   const reject = useRejectUser();
   const toast = useToast();
+  const canApprove = usePermission("admin:edit");
   const [approveTarget, setApproveTarget] = useState<PendingTarget | null>(null);
   const [rejectTarget, setRejectTarget] = useState<PendingTarget | null>(null);
   const [roleId, setRoleId] = useState("");
@@ -108,7 +110,7 @@ export function PendingRegistrationsPage() {
                   <TableHeaderCell>Username</TableHeaderCell>
                   <TableHeaderCell>Email</TableHeaderCell>
                   <TableHeaderCell>Registered</TableHeaderCell>
-                  <TableHeaderCell className="text-right">Actions</TableHeaderCell>
+                  {canApprove ? <TableHeaderCell className="text-right">Actions</TableHeaderCell> : null}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -118,20 +120,22 @@ export function PendingRegistrationsPage() {
                     <TableCell className="text-muted-foreground">{user.username}</TableCell>
                     <TableCell className="text-muted-foreground">{user.email}</TableCell>
                     <TableCell>{formatDateNumeric(user.createdAt)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button size="sm" onClick={() => openApprove({ id: user.id, name: user.fullName })}>
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setRejectTarget({ id: user.id, name: user.fullName })}
-                        >
-                          Reject
-                        </Button>
-                      </div>
-                    </TableCell>
+                    {canApprove ? (
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button size="sm" onClick={() => openApprove({ id: user.id, name: user.fullName })}>
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setRejectTarget({ id: user.id, name: user.fullName })}
+                          >
+                            Reject
+                          </Button>
+                        </div>
+                      </TableCell>
+                    ) : null}
                   </TableRow>
                 ))}
               </TableBody>

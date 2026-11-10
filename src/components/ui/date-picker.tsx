@@ -18,6 +18,19 @@ export interface DatePickerProps {
   onBlur?: () => void;
 }
 
+/** Storage and API use ISO dates; the picker shows MM/DD/YYYY. */
+function isoToDate(value: string | undefined): Date | undefined {
+  if (!value) return undefined;
+  const date = new Date(`${value}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
+function displayToIso(value: string): string {
+  const [month, day, year] = value.split("/");
+  if (!month || !day || !year) return "";
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+}
+
 export function DatePicker({
   id,
   value,
@@ -38,17 +51,14 @@ export function DatePicker({
   useEffect(() => {
     if (!inputRef.current) return;
     pickerRef.current = flatpickr(inputRef.current, {
-      dateFormat: "Y-m-d",
-      altInput: true,
-      altFormat: "m/d/Y",
-      altInputClass: "compact-input",
+      dateFormat: "m/d/Y",
       allowInput: false,
       disableMobile: true,
-      defaultDate: value || undefined,
-      minDate: minDate || undefined,
-      maxDate: maxDate || undefined,
+      defaultDate: isoToDate(value),
+      minDate: isoToDate(minDate) ?? undefined,
+      maxDate: isoToDate(maxDate) ?? undefined,
       onChange: (_dates, dateString) => {
-        onChangeRef.current(dateString);
+        onChangeRef.current(displayToIso(dateString));
       },
     });
     return () => {
@@ -60,19 +70,18 @@ export function DatePicker({
   }, []);
 
   useEffect(() => {
-    pickerRef.current?.setDate(value || [], false);
+    pickerRef.current?.setDate(isoToDate(value) ?? [], false);
   }, [value]);
 
   useEffect(() => {
-    pickerRef.current?.set("minDate", minDate || undefined);
-    pickerRef.current?.set("maxDate", maxDate || undefined);
+    pickerRef.current?.set("minDate", isoToDate(minDate) ?? undefined);
+    pickerRef.current?.set("maxDate", isoToDate(maxDate) ?? undefined);
   }, [minDate, maxDate]);
 
   return (
     <input
       ref={inputRef}
       id={id}
-      type="text"
       className={cn("compact-input", className)}
       placeholder={placeholder}
       disabled={disabled}
