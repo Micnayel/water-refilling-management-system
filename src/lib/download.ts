@@ -23,6 +23,11 @@ export async function downloadFile(path: string, options: DownloadOptions = {}):
   }
   const blob = await response.blob();
   const filename = filenameFromDisposition(response.headers.get("content-disposition")) ?? "export.csv";
+  saveBlob(blob, filename);
+}
+
+/** Triggers a browser download for an in-memory file. */
+export function saveBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;

@@ -99,6 +99,7 @@ export async function queryCustomers(
   const pageSize = input.pageSize ?? 20;
   const filters = [];
   if (input.status) filters.push(eq(customers.status, input.status));
+  if (input.barangay) filters.push(eq(customers.barangay, input.barangay));
   if (input.search) {
     const term = `%${input.search.replaceAll("%", "")}%`;
     filters.push(

@@ -357,7 +357,7 @@
   }
 
   .compact-input {
-    @apply h-8 w-full rounded-md border border-input bg-background px-2.5 text-sm text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-60;
+    @apply h-8 w-full rounded-md border border-input bg-card px-2.5 text-sm text-card-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .screen-reader-text {
@@ -792,15 +792,15 @@
   .form-control,
   .form-control-sm,
   .form-control-lg {
-    background-color: hsl(var(--background) / 0.55);
-    border-color: hsl(var(--border) / 0.9);
+    background-color: hsl(var(--card));
+    border-color: hsl(var(--input));
     border-radius: calc(var(--radius) - 2px);
-    color: hsl(var(--foreground));
+    color: hsl(var(--card-foreground));
     box-shadow: inset 0 1px 2px hsl(0 0% 0% / 0.12);
   }
 
   .form-control::placeholder {
-    color: hsl(var(--muted-foreground) / 0.8);
+    color: hsl(var(--muted-foreground));
   }
 
   .form-control:focus-visible,

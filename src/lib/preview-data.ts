@@ -85,7 +85,30 @@ const customers = [
   { name: "Benito Cruz", barangay: "Diliman", address: "102 Sikatuna Village", gallons: 0, status: "archived" },
 ];
 
-const customerItems = customers.map((entry, index) => ({
+/** Synthetic names so area lists and heat counts stay realistic in preview. */
+const EXTRA_FIRST_NAMES = [
+  "Elena", "Rogelio", "Carmela", "Ferdinand", "Imelda", "Danilo",
+  "Rosario", "Alfredo", "Marissa", "Ricardo", "Lourdes", "Emilio",
+];
+const EXTRA_LAST_NAMES = [
+  "Marquez", "Santos", "Reyes", "Cruz", "Garcia", "Flores",
+  "Mendoza", "Ramos", "Torres", "Bautista", "Navarro", "Salazar",
+  "Dizon", "Velasco", "Pascual", "Ocampo", "Herrera", "Rios",
+];
+const extraCustomers = Array.from({ length: 72 }, (_, index) => {
+  const first = EXTRA_FIRST_NAMES[index % EXTRA_FIRST_NAMES.length] ?? "Elena";
+  const last = EXTRA_LAST_NAMES[Math.floor(index / EXTRA_FIRST_NAMES.length) % EXTRA_LAST_NAMES.length] ?? "Santos";
+  const area = AREAS[index % AREAS.length]?.area ?? "Batasan Hills";
+  return {
+    name: `${first} ${last}`,
+    barangay: area,
+    address: `${14 + index} Mabini St., ${area}`,
+    gallons: index % 6,
+    status: index % 17 === 0 ? "archived" : "active",
+  };
+});
+
+const customerItems = [...customers, ...extraCustomers].map((entry, index) => ({
   id: UUID.customer(index + 1),
   code: `CUS-${String(1041 + index).padStart(4, "0")}`,
   name: entry.name,
@@ -98,7 +121,8 @@ const customerItems = customers.map((entry, index) => ({
   gallonsOnHand: entry.gallons,
   status: entry.status,
   version: 2 + (index % 3),
-  createdAt: timestamp(-(40 - index * 3), 10, 15),
+  // Registered across the last 45 days so date-range changes move the heat map.
+  createdAt: timestamp(-((index % 45) + 1), 9 + (index % 8), (index * 7) % 60),
   masked: true as const,
 }));
 
@@ -231,6 +255,45 @@ const scheduleItems = scheduleSeed.map((entry, index) => {
   };
 });
 
+/** Aggregated heat cells derived from the same preview customers and schedules. */
+function previewHeatPoints(input: Record<string, unknown>) {
+  const from = text(input.from);
+  const to = text(input.to);
+  const metric = text(input.metric);
+  const area = text(input.area);
+  const counts = new Map<string, number>();
+
+  const add = (barangay: string) => {
+    if (!barangay) return;
+    if (area && barangay !== area) return;
+    counts.set(barangay, (counts.get(barangay) ?? 0) + 1);
+  };
+
+  if (metric === "completed-deliveries") {
+    for (const schedule of scheduleItems) {
+      if (schedule.status !== "Completed") continue;
+      if (schedule.scheduledDate < from || schedule.scheduledDate > to) continue;
+      const customer = customerItems.find((entry) => entry.id === schedule.customerId);
+      if (customer) add(customer.barangay);
+    }
+  } else {
+    for (const customer of customerItems) {
+      if (customer.status !== "active") continue;
+      const registered = (customer.createdAt ?? "").slice(0, 10);
+      if (!registered || registered < from || registered > to) continue;
+      add(customer.barangay);
+    }
+  }
+
+  return [...counts.entries()]
+    .map(([name, count]) => {
+      const seed = AREAS.find((entry) => entry.area === name);
+      return seed ? { area: name, latitude: seed.latitude, longitude: seed.longitude, count } : null;
+    })
+    .filter((cell): cell is NonNullable<typeof cell> => cell !== null)
+    .sort((left, right) => right.count - left.count);
+}
+
 const auditEvents = [
   { event: "AUTH_LOGIN", entityType: "session", detail: "Signed in successfully" },
   { event: "SCHEDULE_UPDATE", entityType: "schedule", detail: "Status changed to Out for delivery" },
@@ -349,26 +412,22 @@ export function previewResponse(path: string, method: string, body: unknown): un
   }
 
   if (method === "POST" && pathname === "/heat-map/points") {
-    const metric = text(input.metric);
     return {
       bucket: "barangay",
-      minCellSize: 10,
-      cells: AREAS.map(({ area, latitude, longitude, count }) => ({
-        area,
-        latitude,
-        longitude,
-        count: metric === "completed-deliveries" ? Math.round(count * 0.6) : count,
-      })),
-      suppressedCells: 3,
+      minCellSize: 1,
+      cells: previewHeatPoints(input),
+      suppressedCells: 0,
     };
   }
 
   if (method === "POST" && pathname === "/customers/query") {
     const status = text(input.status);
     const term = text(input.search);
+    const barangay = text(input.barangay);
     const filtered = customerItems.filter(
       (customer) =>
         (!status || customer.status === status) &&
+        (!barangay || customer.barangay === barangay) &&
         (!term || matches(`${customer.name} ${customer.code} ${customer.barangay}`, term)),
     );
     return page(filtered, input);

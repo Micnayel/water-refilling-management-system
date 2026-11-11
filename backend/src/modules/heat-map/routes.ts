@@ -6,12 +6,14 @@ import { customers, schedules } from "../../db/schema";
 import { parseIsoDate } from "../../lib/dates";
 import { errors, parseBody } from "../../lib/errors";
 import { newId } from "../../lib/crypto";
+import { toCsv, toPdf, toXlsx, type ExportFormat } from "./export";
 
 const heatQuerySchema = z.object({
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   metric: z.enum(["customer-density", "completed-deliveries"]),
   area: z.string().trim().max(120).optional(),
+  format: z.enum(["csv", "xlsx", "pdf"]).optional(),
 });
 
 const MIN_CELL_SIZE = 3;
@@ -25,6 +27,14 @@ interface Cell {
   count: number;
 }
 
+/** Customer density counts customers registered inside the selected range. */
+function registrationWindow(input: HeatInput): { start: Date; end: Date } {
+  return {
+    start: new Date(`${input.from}T00:00:00+08:00`),
+    end: new Date(`${input.to}T23:59:59.999+08:00`),
+  };
+}
+
 async function loadCells(ctx: AppContext, input: HeatInput): Promise<{ cells: Cell[]; suppressedCells: number }> {
   const filters = [
     isNotNull(customers.latitude),
@@ -32,7 +42,10 @@ async function loadCells(ctx: AppContext, input: HeatInput): Promise<{ cells: Ce
   ];
   if (input.area) filters.push(eq(customers.barangay, input.area));
   if (input.metric === "customer-density") {
+    const window = registrationWindow(input);
     filters.push(eq(customers.status, "active"));
+    filters.push(gte(customers.createdAt, window.start));
+    filters.push(lte(customers.createdAt, window.end));
   }
 
   const base = ctx.db
@@ -104,20 +117,38 @@ export async function registerHeatMapRoutes(app: FastifyInstance, ctx: AppContex
     ctx.assertGrant(request, "heatmap:export");
     const actor = ctx.requireUser(request);
     const input = parseBody(heatQuerySchema, request.body);
+    const format: ExportFormat = input.format ?? "csv";
     const result = await loadCells(ctx, input);
     await ctx.audit({
       actorId: actor.id,
       event: "HEATMAP_EXPORT",
       entityType: "heat_map",
       entityId: newId(),
-      detail: input.metric,
+      detail: `${input.metric}:${format}`,
     });
-    const header = "area,count,longitude,latitude\n";
-    const body = result.cells
-      .map((cell) => `"${cell.area}",${cell.count},${cell.longitude},${cell.latitude}`)
-      .join("\n");
+
+    const meta = {
+      from: input.from,
+      to: input.to,
+      metric: input.metric,
+      area: input.area,
+      minCellSize: MIN_CELL_SIZE,
+      suppressedCells: result.suppressedCells,
+    };
+    const filename = `heat-map-${input.from}-to-${input.to}.${format}`;
+    reply.header("content-disposition", `attachment; filename=${filename}`);
+    if (format === "xlsx") {
+      reply.header(
+        "content-type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      );
+      return toXlsx(result.cells);
+    }
+    if (format === "pdf") {
+      reply.header("content-type", "application/pdf");
+      return toPdf(result.cells, meta);
+    }
     reply.header("content-type", "text/csv; charset=utf-8");
-    reply.header("content-disposition", "attachment; filename=heat-map.csv");
-    return `${header}${body}`;
+    return toCsv(result.cells, meta);
   });
 }

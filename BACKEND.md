@@ -72,8 +72,8 @@ All paths are relative to `/api/v1` unless noted.
 | GET | `/dashboard/summary` | `dashboard:view` | Aggregated sales, clients, inventory. |
 | GET | `/dashboard/map` | `dashboard:view` | Generalized pins/cells. |
 | POST | `/dashboard/reveal` | `customers:reveal` | Audited field reveal. |
-| POST | `/heat-map/points` | `heatmap:view` | Aggregated buckets, no individual rows. |
-| POST | `/heat-map/export` | `heatmap:export` | Audited CSV export. |
+| POST | `/heat-map/points` | `heatmap:view` | Aggregated buckets, no individual rows. Customer density counts registrations inside `from`/`to`. |
+| POST | `/heat-map/export` | `heatmap:export` | Audited export; `format` is `csv`, `xlsx`, or `pdf`. |
 | POST | `/inventory/query` | `inventory:view` | Paged items. |
 | GET | `/inventory/:id` | `inventory:view` | Item detail. |
 | GET | `/inventory/:id/movements` | `inventory:view` | Movement history. |
@@ -81,7 +81,7 @@ All paths are relative to `/api/v1` unless noted.
 | PATCH | `/inventory/:id` | `inventory:edit` | Versioned update. |
 | POST | `/inventory/:id/movements` | `inventory:edit` | In/out/return/adjust/damaged movement. |
 | GET | `/inventory/export` | `inventory:export` | Audited CSV export. |
-| POST | `/customers/query` | `customers:view` | Paged, masked records. |
+| POST | `/customers/query` | `customers:view` | Paged, masked records; optional `status`, `search`, and exact `barangay`. |
 | GET | `/customers/:id` | `customers:view` | Masked detail. |
 | POST | `/customers/:id/reveal` | `customers:reveal` | Audited reveal. |
 | POST | `/customers` | `customers:add` | Creates a customer. |

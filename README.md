@@ -44,9 +44,11 @@ The router exposes workspaces rather than a forced screen sequence, but records 
 
 ### Heat Map
 
-1. The user opens the Heat Map and selects a date range, area, and metric (for example customer density or completed deliveries).
+1. The user opens the Heat Map and selects a date range, area, and metric. Customer density counts active customers registered between From and To; completed deliveries counts completed schedules in that range.
 2. The API returns aggregated, bucketed points only; no individual customer coordinates or names.
-3. The heat layer renders on Google Maps, with a table of the same area counts as a non-map alternative.
+3. The heat layer renders on a large Google Maps panel, with a table of the same area counts as a non-map alternative.
+4. Selecting an area opens a list of every customer in that area. That list comes from the Customers module, so it needs `customers:view` and keeps its masking rules.
+5. The aggregated result downloads as CSV, Excel (`.xlsx`), or PDF; each live export is audited as `HEATMAP_EXPORT`.
 
 ### Inventory
 

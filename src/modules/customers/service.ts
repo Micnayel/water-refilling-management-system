@@ -12,6 +12,7 @@ export function queryCustomers(input: {
   pageSize: number;
   search?: string;
   status?: "active" | "archived";
+  barangay?: string;
 }): Promise<{ items: MaskedCustomer[]; nextCursor: string | null }> {
   return apiRequest("/customers/query", {
     method: "POST",

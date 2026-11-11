@@ -5,6 +5,7 @@ export const queryCustomersSchema = z.object({
   pageSize: z.number().int().min(1).max(100).optional(),
   search: z.string().trim().max(160).optional(),
   status: z.enum(["active", "archived"]).optional(),
+  barangay: z.string().trim().max(120).optional(),
 });
 
 const coordinate = {
