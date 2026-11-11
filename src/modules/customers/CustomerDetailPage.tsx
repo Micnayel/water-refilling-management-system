@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Alert } from "@/components/ui/alert";
 import { Badge, statusTone } from "@/components/ui/badge";
@@ -29,6 +29,17 @@ export function CustomerDetailPage() {
   const canEdit = usePermission("customers:edit");
   const canDelete = usePermission("customers:delete");
   const [confirmOpen, setConfirmOpen] = useState<false | "archive" | "restore">(false);
+  const autoRevealed = useRef(false);
+
+  // Opening a record is the "View" action: show the full details and exact
+  // location once for permitted users. The API audits the reveal and the value
+  // remasks automatically after the timer below.
+  useEffect(() => {
+    if (autoRevealed.current || !canReveal) return;
+    if (!query.data || query.data.status === "archived") return;
+    autoRevealed.current = true;
+    reveal.mutate();
+  }, [canReveal, query.data, reveal]);
 
   useEffect(() => {
     if (!reveal.data) return;
@@ -187,8 +198,33 @@ export function CustomerDetailPage() {
                   ariaLabel="Exact customer location"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Coordinates {revealed.latitude.toFixed(6)}, {revealed.longitude.toFixed(6)}
+                  Exact location · coordinates {revealed.latitude.toFixed(6)},{" "}
+                  {revealed.longitude.toFixed(6)}
                 </p>
+              </>
+            ) : customer.areaLatitude !== null && customer.areaLongitude !== null ? (
+              <>
+                <BaseMap
+                  points={[
+                    {
+                      label: customer.barangay || "Area",
+                      latitude: customer.areaLatitude,
+                      longitude: customer.areaLongitude,
+                      count: 1,
+                    },
+                  ]}
+                  height="14rem"
+                  ariaLabel="Approximate customer area"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Approximate {customer.barangay ? `${customer.barangay} ` : ""}area center. The
+                  exact door location stays hidden until an audited reveal.
+                </p>
+                {canReveal && !isArchived ? (
+                  <Button variant="outline" size="sm" loading={reveal.isPending} onClick={() => reveal.mutate()}>
+                    Reveal exact location
+                  </Button>
+                ) : null}
               </>
             ) : (
               <div className="rounded-md border border-dashed border-border p-6 text-center text-xs text-muted-foreground">

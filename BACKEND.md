@@ -82,7 +82,7 @@ All paths are relative to `/api/v1` unless noted.
 | POST | `/inventory/:id/movements` | `inventory:edit` | In/out/return/adjust/damaged movement. |
 | GET | `/inventory/export` | `inventory:export` | Audited CSV export. |
 | POST | `/customers/query` | `customers:view` | Paged, masked records; optional `status`, `search`, and exact `barangay`. |
-| GET | `/customers/:id` | `customers:view` | Masked detail. |
+| GET | `/customers/:id` | `customers:view` | Masked detail plus a generalized barangay center when at least three located customers share it. |
 | POST | `/customers/:id/reveal` | `customers:reveal` | Audited reveal. |
 | POST | `/customers` | `customers:add` | Creates a customer. |
 | PATCH | `/customers/:id` | `customers:edit` | Versioned update. |

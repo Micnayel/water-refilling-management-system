@@ -47,22 +47,26 @@ The router exposes workspaces rather than a forced screen sequence, but records 
 1. The user opens the Heat Map and selects a date range, area, and metric. Customer density counts active customers registered between From and To; completed deliveries counts completed schedules in that range.
 2. The API returns aggregated, bucketed points only; no individual customer coordinates or names.
 3. The heat layer renders on a large Google Maps panel, with a table of the same area counts as a non-map alternative.
-4. Selecting an area opens a list of every customer in that area. That list comes from the Customers module, so it needs `customers:view` and keeps its masking rules.
-5. The aggregated result downloads as CSV, Excel (`.xlsx`), or PDF; each live export is audited as `HEATMAP_EXPORT`.
+4. Selecting an area opens a list of every customer in that area, and **Show all** opens the same list across every area. That list comes from the Customers module, so it needs `customers:view` and keeps its masking rules.
+5. Selecting a customer address in that list opens an in-app driving-directions map from the station. The destination is the generalized area center until the exact location is revealed; coordinates never go into the URL.
+6. The aggregated result downloads as CSV, Excel (`.xlsx`), or PDF; each live export is audited as `HEATMAP_EXPORT`.
 
 ### Inventory
 
-1. A user adds a gallon stock item or type with its opening quantity.
-2. Stock changes only through stock movements (in, out, return, adjust), each with a reason.
-3. Completing a schedule posts the matching movement automatically.
-4. Quantities by state (full, empty, with customer, damaged) feed the Dashboard inventory count; stock cannot go negative.
+1. A user with `inventory:add` adds a gallon stock item or type with its opening quantity (**Add item**).
+2. A user with `inventory:edit` records stock from the list with **Add stock**, choosing the item, movement type, quantity, and reason.
+3. Stock changes only through stock movements (in, out, return, adjust), each with a reason.
+4. Completing a schedule posts the matching movement automatically.
+5. Quantities by state (full, empty, with customer, damaged) feed the Dashboard inventory count; stock cannot go negative.
 
 ### Customers
 
-1. A user creates a customer with contact details and a delivery location chosen on the map or geocoded from the address.
-2. Sensitive fields stay masked until a permitted, audited reveal.
-3. Gallons on hand and delivery history update as schedules complete.
-4. Customers who stop ordering are archived, and can be restored.
+1. A user with `customers:add` creates a customer with contact details and a delivery location chosen on the map or geocoded from the address (**Add customer**).
+2. The list searches as you type; there is no Apply button. Status changes apply immediately.
+3. Viewing a customer shows the full details and exact map location for users with `customers:reveal`; the reveal is audited and remasks automatically. Other users keep masking and see the generalized barangay map.
+4. Sensitive fields stay masked until a permitted, audited reveal.
+5. Gallons on hand and delivery history update as schedules complete.
+6. Customers who stop ordering are archived, and can be restored.
 
 ### Scheduling
 
@@ -126,11 +130,12 @@ Local development uses one ignored `backend/.env` for the API and Vite. Vite rea
 
 ### Preview data
 
-Set `VITE_PREVIEW_DATA=true` when building (or running `npm run dev`) to render synthetic records in every module for design review without touching the database. Preview mode is read-only: only `:view` grants are honoured, so create, edit, delete, export, reveal, and approval controls stay hidden and a "Preview data" banner appears. Fixtures live in `src/lib/preview-data.ts` and are parsed through the same Zod schemas as the API responses. Never enable preview mode against a database that should not be touched, and never copy fixture values into production records.
+Set `VITE_PREVIEW_DATA=true` when building (or running `npm run dev`) to render synthetic records in every module for design review without touching the database. Preview mode serves reads plus three in-browser demo flows: adding a customer, adding stock, and revealing a customer location. Those changes live in memory for the browser session only. Other writes, exports, and approvals stay hidden, and a "Preview data" banner appears. Fixtures live in `src/lib/preview-data.ts` and are parsed through the same Zod schemas as the API responses. Never enable preview mode against a database that should not be touched, and never copy fixture values into production records.
 
 ### Google Maps configuration
 
-- `VITE_GOOGLE_MAPS_API_KEY` is the browser key for the Dashboard map and Heat Map. It is public by design, so restrict it by HTTP referrer and to the Maps JavaScript API only. It is the only `VITE_` key that is not the API proxy target.
+- `VITE_GOOGLE_MAPS_API_KEY` is the browser key for the Dashboard map, Heat Map, and in-app driving directions. It is public by design, so restrict it by HTTP referrer. It must allow the Maps JavaScript API and the Routes library (`Route.computeRoutes`); it is the only `VITE_` key that is not the API proxy target.
+- Driving directions are computed and drawn inside the Maps SDK. No directions request, address, or coordinate is placed in a URL.
 - Server-side geocoding uses a separate `WRMS_GOOGLE_*` key in `backend/.env`; it is never exposed to the browser.
 - Without a key, map screens show a clear unavailable state and the table alternative still works.
 - Google's heat layer in the Maps JavaScript API has been deprecated; the layer in use and the reason are tracked in [open questions](docs/open-questions.md).

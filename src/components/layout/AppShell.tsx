@@ -292,7 +292,8 @@ export function AppShell() {
                 <InfoIcon className="size-4 text-warning" />
                 <span>
                   <strong className="font-semibold">Preview data.</strong> Synthetic sample records for
-                  design review. Actions that change data are hidden.
+                  design review. Customer and stock additions stay in this browser session and are
+                  never saved.
                 </span>
               </div>
             ) : null}

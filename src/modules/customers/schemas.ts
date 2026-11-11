@@ -15,6 +15,9 @@ export const maskedCustomerSchema = z.object({
   version: z.number(),
   createdAt: z.string().nullable(),
   masked: z.literal(true),
+  /** Barangay-level center, only when enough located customers share it. */
+  areaLatitude: z.number().nullable(),
+  areaLongitude: z.number().nullable(),
 });
 
 export const revealedCustomerSchema = z.object({

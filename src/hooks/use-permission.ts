@@ -2,11 +2,20 @@ import { isPreviewMode } from "@/lib/preview";
 import { useSessionStore, hasGrant } from "@/stores/session-store";
 
 /**
- * Preview mode is read-only: it serves synthetic records, so every non-view
- * grant is denied and the write, export, and reveal controls stay hidden.
+ * Preview mode serves synthetic records. Reads are allowed, plus the two demo
+ * add flows (customers and inventory) that stay in this browser session, and
+ * the audited-style reveal used to preview exact locations. Other writes and
+ * exports stay hidden.
  */
+const PREVIEW_EXTRA_GRANTS = new Set([
+  "customers:add",
+  "customers:reveal",
+  "inventory:add",
+  "inventory:edit",
+]);
+
 function allowInPreview(grant: string): boolean {
-  return !isPreviewMode() || grant.endsWith(":view");
+  return !isPreviewMode() || grant.endsWith(":view") || PREVIEW_EXTRA_GRANTS.has(grant);
 }
 
 export function usePermission(grant: string): boolean {

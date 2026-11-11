@@ -22,16 +22,19 @@ import { downloadFile } from "@/lib/download";
 import { apiMessage } from "@/lib/api-client";
 import { formatNumber } from "@/lib/money";
 import { usePermission } from "@/hooks/use-permission";
+import { AddStockDialog } from "./AddStockDialog";
 import { useInventoryList } from "./hooks";
 
 export function InventoryListPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [lowStock, setLowStock] = useState(false);
+  const [stockOpen, setStockOpen] = useState(false);
   const query = useInventoryList(page, pageSize, lowStock);
   const navigate = useNavigate();
   const toast = useToast();
   const canAdd = usePermission("inventory:add");
+  const canEdit = usePermission("inventory:edit");
   const canExport = usePermission("inventory:export");
 
   const exportCsv = async () => {
@@ -55,7 +58,12 @@ export function InventoryListPage() {
                 Export
               </Button>
             ) : null}
-            {canAdd ? <Button onClick={() => navigate("/inventory/new")}>New item</Button> : null}
+            {canEdit ? (
+              <Button variant="outline" onClick={() => setStockOpen(true)}>
+                Add stock
+              </Button>
+            ) : null}
+            {canAdd ? <Button onClick={() => navigate("/inventory/new")}>Add item</Button> : null}
           </>
         }
       />
@@ -86,7 +94,7 @@ export function InventoryListPage() {
           <EmptyState
             title="No inventory items yet"
             description="Add a gallon item to start tracking stock by state."
-            action={canAdd ? <Button onClick={() => navigate("/inventory/new")}>New item</Button> : undefined}
+            action={canAdd ? <Button onClick={() => navigate("/inventory/new")}>Add item</Button> : undefined}
           />
         ) : (
           <>
@@ -146,6 +154,12 @@ export function InventoryListPage() {
       <Alert tone="info">
         Stock can never go negative. A stale record returns a conflict and asks you to reload.
       </Alert>
+
+      <AddStockDialog
+        open={stockOpen}
+        items={query.data?.items ?? []}
+        onOpenChange={setStockOpen}
+      />
     </div>
   );
 }

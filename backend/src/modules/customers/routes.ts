@@ -11,6 +11,7 @@ import {
   updateCustomerSchema,
 } from "./schemas";
 import {
+  approximateArea,
   findCustomer,
   maskCustomer,
   queryCustomers,
@@ -30,7 +31,7 @@ export async function registerCustomerRoutes(app: FastifyInstance, ctx: AppConte
     ctx.assertGrant(request, "customers:view");
     const row = await findCustomer(ctx.db, request.params.id);
     if (!row) throw errors.notFound();
-    return maskCustomer(row);
+    return { ...maskCustomer(row), ...(await approximateArea(ctx.db, row.barangay)) };
   });
 
   app.post<{ Params: { id: string } }>("/customers/:id/reveal", hooks, async (request) => {

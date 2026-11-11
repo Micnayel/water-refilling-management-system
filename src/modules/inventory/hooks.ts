@@ -61,3 +61,13 @@ export function useAddMovement(id: string) {
     onSuccess: invalidate,
   });
 }
+
+/** Records a movement for an item chosen inside a form rather than a route. */
+export function useRecordStock() {
+  const invalidate = useInvalidateInventory();
+  return useMutation({
+    mutationFn: (input: { id: string; values: MovementValues & { version: number } }) =>
+      service.addMovement(input.id, input.values),
+    onSuccess: invalidate,
+  });
+}

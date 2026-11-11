@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge, statusTone } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import { useToast } from "@/components/ui/toaster";
 import { apiMessage } from "@/lib/api-client";
 import { downloadFile } from "@/lib/download";
 import { formatNumber } from "@/lib/money";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { usePermission } from "@/hooks/use-permission";
 import { useCustomerList } from "./hooks";
 
@@ -28,7 +29,8 @@ export function CustomerListPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
+  // Searching happens as you type; the delay keeps requests to one per pause.
+  const search = useDebouncedValue(searchInput.trim(), 300);
   const [status, setStatus] = useState<"" | "active" | "archived">("active");
   const query = useCustomerList(page, pageSize, search, status);
   const navigate = useNavigate();
@@ -36,11 +38,9 @@ export function CustomerListPage() {
   const canAdd = usePermission("customers:add");
   const canExport = usePermission("customers:export");
 
-  const onSearch = (event: FormEvent) => {
-    event.preventDefault();
-    setSearch(searchInput.trim());
+  useEffect(() => {
     setPage(1);
-  };
+  }, [search, status]);
 
   const exportCsv = async () => {
     try {
@@ -63,12 +63,12 @@ export function CustomerListPage() {
                 Export
               </Button>
             ) : null}
-            {canAdd ? <Button onClick={() => navigate("/customers/new")}>New customer</Button> : null}
+            {canAdd ? <Button onClick={() => navigate("/customers/new")}>Add customer</Button> : null}
           </>
         }
       />
 
-      <form className="toolbar-surface flex flex-wrap items-end gap-2" onSubmit={onSearch} role="search">
+      <div className="toolbar-surface flex flex-wrap items-end gap-2" role="search">
         <div className="min-w-[12rem] flex-1">
           <label htmlFor="customer-search" className="text-xs font-medium text-muted-foreground">
             Search
@@ -89,7 +89,6 @@ export function CustomerListPage() {
             value={status}
             onChange={(event) => {
               setStatus(event.target.value as "" | "active" | "archived");
-              setPage(1);
             }}
           >
             <option value="active">Active</option>
@@ -97,10 +96,7 @@ export function CustomerListPage() {
             <option value="">All</option>
           </NativeSelect>
         </div>
-        <Button type="submit" variant="outline">
-          Apply
-        </Button>
-      </form>
+      </div>
 
       <div className="card-surface overflow-hidden">
         {query.isLoading ? (
@@ -116,7 +112,7 @@ export function CustomerListPage() {
           <EmptyState
             title="No customers found"
             description="Adjust the filters, or add a new customer."
-            action={canAdd ? <Button onClick={() => navigate("/customers/new")}>New customer</Button> : undefined}
+            action={canAdd ? <Button onClick={() => navigate("/customers/new")}>Add customer</Button> : undefined}
           />
         ) : (
           <>

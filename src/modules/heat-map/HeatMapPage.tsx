@@ -37,11 +37,12 @@ export function HeatMapPage() {
   const [to, setTo] = useState(todayIso());
   const [metric, setMetric] = useState<HeatQuery["metric"]>("customer-density");
   const [area, setArea] = useState("");
-  const [selectedArea, setSelectedArea] = useState<{ area: string; count: number } | null>(null);
+  const [selection, setSelection] = useState<{ area: string | null; count?: number } | null>(null);
   const [exporting, setExporting] = useState<HeatExportFormat | null>(null);
   const normalizedArea = area.trim() || undefined;
   const query = useHeatPoints({ from, to, metric, area: normalizedArea });
   const toast = useToast();
+  const canViewCustomers = usePermission("customers:view");
   // Preview mode hides write controls, but these exports are generated from the
   // synthetic cells in the browser and never touch the live database.
   const canExport = usePermission("heatmap:export") || isPreviewMode();
@@ -184,11 +185,18 @@ export function HeatMapPage() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Area counts</CardTitle>
-          <p className="text-xs text-muted-foreground">
-            The non-map alternative for the same data. Select an area to see all of its customers.
-          </p>
+        <CardHeader className="flex-row items-start justify-between gap-2">
+          <div className="min-w-0">
+            <CardTitle>Area counts</CardTitle>
+            <p className="text-xs text-muted-foreground">
+              The non-map alternative for the same data. Select an area to see all of its customers.
+            </p>
+          </div>
+          {canViewCustomers ? (
+            <Button variant="outline" size="sm" onClick={() => setSelection({ area: null })}>
+              Show all
+            </Button>
+          ) : null}
         </CardHeader>
         <CardContent className="p-0">
           {query.isLoading ? (
@@ -221,7 +229,7 @@ export function HeatMapPage() {
                         <button
                           type="button"
                           className="btn-reset inline-flex max-w-full items-center gap-1 text-left font-medium text-foreground underline-offset-4 hover:text-primary hover:underline focus-visible:underline"
-                          onClick={() => setSelectedArea({ area: cell.area, count: cell.count })}
+                          onClick={() => setSelection({ area: cell.area, count: cell.count })}
                           aria-label={`Show all customers in ${cell.area}`}
                         >
                           <span className="truncate">{cell.area}</span>
@@ -233,7 +241,7 @@ export function HeatMapPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setSelectedArea({ area: cell.area, count: cell.count })}
+                          onClick={() => setSelection({ area: cell.area, count: cell.count })}
                           aria-label={`View customers in ${cell.area}`}
                         >
                           View
@@ -256,10 +264,11 @@ export function HeatMapPage() {
       ) : null}
 
       <AreaCustomersDialog
-        area={selectedArea?.area ?? null}
-        cellCount={selectedArea?.count ?? 0}
+        open={selection !== null}
+        area={selection?.area ?? null}
+        cellCount={selection?.count}
         onOpenChange={(open) => {
-          if (!open) setSelectedArea(null);
+          if (!open) setSelection(null);
         }}
       />
     </div>

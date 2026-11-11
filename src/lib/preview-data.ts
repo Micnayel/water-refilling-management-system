@@ -108,6 +108,15 @@ const extraCustomers = Array.from({ length: 72 }, (_, index) => {
   };
 });
 
+/** Barangay center used as the generalized location for preview customers. */
+function previewArea(barangay: string) {
+  const seed = AREAS.find((entry) => entry.area.toLowerCase() === barangay.trim().toLowerCase());
+  return {
+    areaLatitude: seed ? seed.latitude : null,
+    areaLongitude: seed ? seed.longitude : null,
+  };
+}
+
 const customerItems = [...customers, ...extraCustomers].map((entry, index) => ({
   id: UUID.customer(index + 1),
   code: `CUS-${String(1041 + index).padStart(4, "0")}`,
@@ -124,6 +133,7 @@ const customerItems = [...customers, ...extraCustomers].map((entry, index) => ({
   // Registered across the last 45 days so date-range changes move the heat map.
   createdAt: timestamp(-((index % 45) + 1), 9 + (index % 8), (index * 7) % 60),
   masked: true as const,
+  ...previewArea(entry.barangay),
 }));
 
 const users = [
@@ -433,9 +443,117 @@ export function previewResponse(path: string, method: string, body: unknown): un
     return page(filtered, input);
   }
 
+  if (method === "POST" && pathname === "/customers") {
+    const index = customerItems.length + 1;
+    const barangay = text(input.barangay).trim();
+    const created = {
+      id: UUID.customer(index),
+      code: `CUS-${String(1041 + index).padStart(4, "0")}`,
+      name: text(input.name).trim() || "New Customer",
+      contact: text(input.contact).trim(),
+      email: text(input.email).trim(),
+      address: text(input.address).trim(),
+      barangay,
+      latitude: null,
+      longitude: null,
+      gallonsOnHand: 0,
+      status: "active",
+      version: 1,
+      createdAt: new Date().toISOString(),
+      masked: true as const,
+      ...previewArea(barangay),
+    };
+    // Newest first, matching the live list ordering.
+    customerItems.unshift(created);
+    return created;
+  }
+
+  if (method === "POST" && pathname.startsWith("/customers/") && pathname.endsWith("/reveal")) {
+    const id = pathname.slice("/customers/".length, -"/reveal".length);
+    const customer = customerItems.find((entry) => entry.id === id) ?? customerItems[0];
+    const center = previewArea(customer?.barangay ?? "");
+    // The demo has no exact pin, so the barangay center stands in for it.
+    return {
+      ...(customer ?? {}),
+      latitude: center.areaLatitude,
+      longitude: center.areaLongitude,
+      masked: false as const,
+    };
+  }
+
   if (method === "GET" && pathname.startsWith("/customers/")) {
     const id = pathname.slice("/customers/".length);
     return customerItems.find((customer) => customer.id === id) ?? customerItems[0];
+  }
+
+  if (method === "POST" && pathname === "/inventory") {
+    const index = inventoryItems.length + 1;
+    const opening = typeof input.openingQuantity === "number" ? Math.max(0, input.openingQuantity) : 0;
+    const reorderLevel = typeof input.reorderLevel === "number" ? input.reorderLevel : 0;
+    const created = {
+      id: UUID.item(index),
+      name: text(input.name).trim() || "New gallon item",
+      sku: text(input.sku).trim() || `WTR-DEMO-${index}`,
+      gallonsFull: opening,
+      gallonsEmpty: 0,
+      gallonsWithCustomer: 0,
+      gallonsDamaged: 0,
+      reorderLevel,
+      lowStock: opening <= reorderLevel,
+      version: 1,
+      createdAt: new Date().toISOString(),
+    };
+    inventoryItems.unshift(created);
+    if (opening > 0) {
+      movementItems.unshift({
+        id: UUID.movement(100 + index),
+        itemId: created.id,
+        type: "in",
+        quantity: opening,
+        reason: "Opening stock",
+        actorId: UUID.user(1),
+        scheduleId: null,
+        createdAt: new Date().toISOString(),
+      });
+    }
+    return created;
+  }
+
+  if (method === "POST" && pathname.startsWith("/inventory/") && pathname.endsWith("/movements")) {
+    const id = pathname.slice("/inventory/".length, -"/movements".length);
+    const item = inventoryItems.find((entry) => entry.id === id) ?? inventoryItems[0];
+    if (!item) return undefined;
+    const type = text(input.type) || "in";
+    const quantity = typeof input.quantity === "number" ? input.quantity : 0;
+    const apply = (target: number, delta: number) => Math.max(0, target + delta);
+    if (type === "in") item.gallonsFull = apply(item.gallonsFull, quantity);
+    if (type === "out") item.gallonsFull = apply(item.gallonsFull, -quantity);
+    if (type === "deliver") {
+      item.gallonsFull = apply(item.gallonsFull, -quantity);
+      item.gallonsWithCustomer = apply(item.gallonsWithCustomer, quantity);
+    }
+    if (type === "return") {
+      item.gallonsWithCustomer = apply(item.gallonsWithCustomer, -quantity);
+      item.gallonsEmpty = apply(item.gallonsEmpty, quantity);
+    }
+    if (type === "damaged") {
+      item.gallonsFull = apply(item.gallonsFull, -quantity);
+      item.gallonsDamaged = apply(item.gallonsDamaged, quantity);
+    }
+    if (type === "adjust") item.gallonsFull = apply(item.gallonsFull, quantity);
+    item.lowStock = item.gallonsFull <= item.reorderLevel;
+    item.version += 1;
+    movementItems.unshift({
+      id: UUID.movement(200 + item.version),
+      itemId: item.id,
+      type,
+      quantity,
+      reason: text(input.reason).trim() || "Recorded in preview",
+      actorId: UUID.user(1),
+      scheduleId: null,
+      createdAt: new Date().toISOString(),
+    });
+    return item;
   }
 
   if (method === "POST" && pathname === "/inventory/query") {

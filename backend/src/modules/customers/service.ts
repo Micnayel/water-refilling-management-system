@@ -1,4 +1,4 @@
-import { and, desc, eq, like, or } from "drizzle-orm";
+import { and, desc, eq, isNotNull, like, or, sql } from "drizzle-orm";
 import type { Database } from "../../db/client";
 import { customers } from "../../db/schema";
 import { buildPage, decodeCursor, type Page } from "../../lib/pagination";
@@ -19,6 +19,8 @@ export interface MaskedCustomer {
   version: number;
   createdAt: string | null;
   masked: boolean;
+  areaLatitude: number | null;
+  areaLongitude: number | null;
 }
 
 export interface RevealedCustomer extends Omit<MaskedCustomer, "masked" | "latitude" | "longitude"> {
@@ -64,6 +66,41 @@ export function maskCustomer(row: typeof customers.$inferSelect): MaskedCustomer
     version: row.version,
     createdAt: row.createdAt ? new Date(row.createdAt).toISOString() : null,
     masked: true,
+    areaLatitude: null,
+    areaLongitude: null,
+  };
+}
+
+/**
+ * Barangay-level center for a masked record. Only returned when at least three
+ * located customers share the barangay, so a single record cannot be inferred.
+ */
+export async function approximateArea(
+  db: Database,
+  barangay: string,
+): Promise<{ areaLatitude: number | null; areaLongitude: number | null }> {
+  if (!barangay) return { areaLatitude: null, areaLongitude: null };
+  const rows = await db
+    .select({
+      count: sql<number>`count(*)`,
+      latitude: sql<number>`avg(cast(${customers.latitude} as decimal(10,6)))`,
+      longitude: sql<number>`avg(cast(${customers.longitude} as decimal(10,6)))`,
+    })
+    .from(customers)
+    .where(
+      and(
+        eq(customers.barangay, barangay),
+        isNotNull(customers.latitude),
+        isNotNull(customers.longitude),
+      ),
+    );
+  const row = rows[0];
+  if (!row || Number(row.count) < 3 || row.latitude === null || row.longitude === null) {
+    return { areaLatitude: null, areaLongitude: null };
+  }
+  return {
+    areaLatitude: Math.round(Number(row.latitude) * 1000) / 1000,
+    areaLongitude: Math.round(Number(row.longitude) * 1000) / 1000,
   };
 }
 
@@ -83,6 +120,8 @@ export function revealCustomer(row: typeof customers.$inferSelect): RevealedCust
     version: row.version,
     createdAt: row.createdAt ? new Date(row.createdAt).toISOString() : null,
     masked: false,
+    areaLatitude: null,
+    areaLongitude: null,
   };
 }
 
