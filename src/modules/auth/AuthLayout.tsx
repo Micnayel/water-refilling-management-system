@@ -1,13 +1,8 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { CheckIcon, DropletIcon, ShieldIcon } from "@/components/ui/icons";
+import { DropletIcon, ShieldIcon } from "@/components/ui/icons";
 import { brand } from "@/config/brand";
-
-const highlights = [
-  "Live sales, clients, and gallon stock in one view",
-  "Masked customer locations with audited reveals",
-  "Schedules that post stock and sales together",
-];
+import { AuthMobileShowcase, AuthShowcase } from "./AuthShowcase";
 
 export function AuthLayout({
   title,
@@ -22,10 +17,16 @@ export function AuthLayout({
 }) {
   return (
     <main className="app-canvas min-h-screen lg:grid lg:grid-cols-[1.05fr_1fr]">
-      <section className="hero-panel relative hidden flex-col justify-between p-10 lg:flex" aria-hidden="true">
+      <section
+        className="hero-panel relative hidden flex-col justify-between p-10 lg:flex"
+        aria-label="System highlights"
+      >
+        <span className="auth-orb auth-orb--one" aria-hidden />
+        <span className="auth-orb auth-orb--two" aria-hidden />
+
         <div className="relative z-10">
           <div className="flex items-center gap-3">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-white/15 text-white ring-1 ring-white/25 backdrop-blur">
+            <span className="auth-logo-ripple flex size-10 items-center justify-center rounded-xl bg-white/15 text-white ring-1 ring-white/25 backdrop-blur">
               <DropletIcon className="size-5" />
             </span>
             <div>
@@ -36,25 +37,15 @@ export function AuthLayout({
             </div>
           </div>
 
-          <div className="mt-20 max-w-md">
+          <div className="mt-14 max-w-md">
             <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.25em] text-white/70">
               Operations workspace
             </p>
             <h1 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-white">
-              Every gallon accounted for, every delivery on time.
+              Subscriptions, orders, schedules, and deliveries in one flow.
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-white/75">{brand.productName}</p>
-
-            <ul className="mt-8 space-y-3">
-              {highlights.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-sm text-white/85">
-                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/20">
-                    <CheckIcon className="size-3" />
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <AuthShowcase />
           </div>
         </div>
 
@@ -86,6 +77,8 @@ export function AuthLayout({
             {children}
             {footer ? <div className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">{footer}</div> : null}
           </div>
+
+          <AuthMobileShowcase />
 
           <p className="text-center text-xs text-muted-foreground">
             <Link to="/login" className="transition-colors hover:text-foreground">
