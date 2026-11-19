@@ -3,6 +3,7 @@ import flatpickr from "flatpickr";
 import type { Instance } from "flatpickr/dist/types/instance";
 import "flatpickr/dist/flatpickr.min.css";
 import { cn } from "@/lib/utils";
+import { CalendarIcon } from "./icons";
 
 export interface DatePickerProps {
   id?: string;
@@ -79,14 +80,23 @@ export function DatePicker({
   }, [minDate, maxDate]);
 
   return (
-    <input
-      ref={inputRef}
-      id={id}
-      className={cn("compact-input", className)}
-      placeholder={placeholder}
-      disabled={disabled}
-      onBlur={onBlur}
-      {...aria}
-    />
+    <div className="relative">
+      <input
+        ref={inputRef}
+        id={id}
+        className={cn(
+          "compact-input pr-8 text-base focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
+          className,
+        )}
+        placeholder={placeholder}
+        disabled={disabled}
+        onBlur={onBlur}
+        {...aria}
+      />
+      <CalendarIcon
+        aria-hidden
+        className="pointer-events-none absolute right-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+      />
+    </div>
   );
 }

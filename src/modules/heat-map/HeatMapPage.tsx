@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NativeSelect } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Field } from "@/components/ui/field";
 import { ChevronRightIcon } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/page-header";
@@ -106,24 +107,15 @@ export function HeatMapPage() {
         }
       />
 
-      <div className="card-surface space-y-2 p-3">
-        <div className="flex flex-wrap items-end gap-2">
-          <div className="w-40">
-            <label htmlFor="heat-from" className="text-xs font-medium text-muted-foreground">
-              From
-            </label>
+      <div className="card-surface space-y-3 p-3">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <Field label="From" htmlFor="heat-from">
             <DatePicker id="heat-from" value={from} onChange={setFrom} maxDate={to} />
-          </div>
-          <div className="w-40">
-            <label htmlFor="heat-to" className="text-xs font-medium text-muted-foreground">
-              To
-            </label>
+          </Field>
+          <Field label="To" htmlFor="heat-to">
             <DatePicker id="heat-to" value={to} onChange={setTo} minDate={from} />
-          </div>
-          <div className="w-48">
-            <label htmlFor="heat-metric" className="text-xs font-medium text-muted-foreground">
-              Metric
-            </label>
+          </Field>
+          <Field label="Metric" htmlFor="heat-metric">
             <NativeSelect
               id="heat-metric"
               value={metric}
@@ -135,18 +127,15 @@ export function HeatMapPage() {
                 </option>
               ))}
             </NativeSelect>
-          </div>
-          <div className="w-48">
-            <label htmlFor="heat-area" className="text-xs font-medium text-muted-foreground">
-              Area (optional)
-            </label>
+          </Field>
+          <Field label="Area (optional)" htmlFor="heat-area">
             <Input
               id="heat-area"
               placeholder="Barangay"
               value={area}
               onChange={(event) => setArea(event.target.value)}
             />
-          </div>
+          </Field>
         </div>
         <p className="text-xs text-muted-foreground">
           {metric === "customer-density"
