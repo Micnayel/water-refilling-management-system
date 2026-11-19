@@ -118,6 +118,8 @@ All paths are relative to `/api/v1` unless noted.
 | GET | `/users/export` | `admin:export` | Audited CSV export. |
 | GET | `/settings/preferences` | `settings:view` | Current user's template. |
 | PUT | `/settings/preferences` | `settings:view` | Saves own template. |
+| GET | `/settings/station` | `heatmap:view` or `settings:view` | Station origin for driving directions. Not personal data. |
+| PUT | `/settings/station` | `settings:edit` | Versioned station origin update, audited as `SETTINGS_UPDATE`. |
 | GET | `/settings/system` | `settings:view` | System settings. |
 | PUT | `/settings/system` | `settings:edit` | Versioned system setting update. |
 

@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { apiRequest } from "@/lib/api-client";
+import {
+  stationLocationResponseSchema,
+  type StationLocationValues,
+} from "./schemas";
 
 export const preferenceSchema = z.object({ template: z.string() });
 
@@ -28,6 +32,18 @@ export function saveTemplate(template: string) {
 
 export function getSystemSettings() {
   return apiRequest("/settings/system", { schema: systemSettingsSchema });
+}
+
+export function getStationLocation() {
+  return apiRequest("/settings/station", { schema: stationLocationResponseSchema });
+}
+
+export function saveStationLocation(values: StationLocationValues & { version?: number }) {
+  return apiRequest("/settings/station", {
+    method: "PUT",
+    body: values,
+    schema: stationLocationResponseSchema,
+  });
 }
 
 export function saveSystemSettings(input: { sessionTimeoutMinutes: number; version?: number }) {

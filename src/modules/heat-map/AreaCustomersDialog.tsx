@@ -11,9 +11,10 @@ import { DirectionsMap } from "@/components/maps";
 import { apiMessage } from "@/lib/api-client";
 import { formatDateNumeric } from "@/lib/dates";
 import { isPreviewMode } from "@/lib/preview";
-import { stationLocation } from "@/config/brand";
+import { stationLocation as defaultStationLocation } from "@/config/brand";
 import { usePermission } from "@/hooks/use-permission";
 import { getCustomer, queryCustomers, type MaskedCustomer } from "@/modules/customers";
+import { useStationLocation } from "@/modules/settings";
 
 export interface AreaCustomersDialogProps {
   open: boolean;
@@ -55,6 +56,8 @@ async function loadCustomers(area: string | null): Promise<MaskedCustomer[]> {
  */
 export function AreaCustomersDialog({ open, area, cellCount, onOpenChange }: AreaCustomersDialogProps) {
   const canViewCustomers = usePermission("customers:view");
+  const stationQuery = useStationLocation();
+  const station = stationQuery.data ?? defaultStationLocation;
   const [target, setTarget] = useState<RouteTarget | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [routeError, setRouteError] = useState<string | null>(null);
@@ -145,7 +148,7 @@ export function AreaCustomersDialog({ open, area, cellCount, onOpenChange }: Are
             </Button>
           </div>
           <DirectionsMap
-            origin={stationLocation}
+            origin={station}
             destination={{ latitude: target.latitude, longitude: target.longitude }}
             destinationLabel={target.label}
             height="clamp(16rem, 40vh, 24rem)"

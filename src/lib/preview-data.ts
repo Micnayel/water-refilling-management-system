@@ -352,6 +352,14 @@ const systemSettings = {
   ],
 };
 
+/** Demo dispatch origin; updates stay in this browser session. */
+let stationLocationSetting = {
+  label: "Quezon City station",
+  latitude: 14.676,
+  longitude: 121.0437,
+  version: 1,
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
@@ -650,6 +658,22 @@ export function previewResponse(path: string, method: string, body: unknown): un
 
   if (method === "PUT" && pathname === "/settings/preferences") {
     return { template: text(input.template) || "default" };
+  }
+
+  if (method === "GET" && pathname === "/settings/station") {
+    return stationLocationSetting;
+  }
+
+  if (method === "PUT" && pathname === "/settings/station") {
+    stationLocationSetting = {
+      label: text(input.label).trim() || stationLocationSetting.label,
+      latitude:
+        typeof input.latitude === "number" ? input.latitude : stationLocationSetting.latitude,
+      longitude:
+        typeof input.longitude === "number" ? input.longitude : stationLocationSetting.longitude,
+      version: stationLocationSetting.version + 1,
+    };
+    return stationLocationSetting;
   }
 
   if (method === "GET" && pathname === "/settings/system") {

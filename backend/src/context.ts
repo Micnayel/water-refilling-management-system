@@ -26,6 +26,7 @@ export interface AppContext {
   requireSession(request: FastifyRequest): SessionData;
   requireUser(request: FastifyRequest): AuthUser;
   assertGrant(request: FastifyRequest, grant: string): void;
+  assertAnyGrant(request: FastifyRequest, grants: string[]): void;
 }
 
 export function toAuthUser(row: typeof users.$inferSelect): AuthUser {
@@ -108,6 +109,11 @@ export function createContext(db: Database, sessions: SessionStore): AppContext 
     if (!user.grants.includes(grant)) throw errors.forbidden();
   };
 
+  const assertAnyGrant = (request: FastifyRequest, grants: string[]): void => {
+    const user = requireUser(request);
+    if (!grants.some((grant) => user.grants.includes(grant))) throw errors.forbidden();
+  };
+
   return {
     db,
     sessions,
@@ -117,5 +123,6 @@ export function createContext(db: Database, sessions: SessionStore): AppContext 
     requireSession,
     requireUser,
     assertGrant,
+    assertAnyGrant,
   };
 }

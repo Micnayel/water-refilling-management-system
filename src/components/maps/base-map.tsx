@@ -66,7 +66,13 @@ export function BaseMap({
     overlaysRef.current =
       mode === "heat" ? createHeatCells(map, points) : createMarkers(map, points);
 
-    if (points.length > 0) {
+    if (points.length === 1) {
+      const only = points[0];
+      if (only) {
+        map.setCenter({ lat: only.latitude, lng: only.longitude });
+        map.setZoom(15);
+      }
+    } else if (points.length > 1) {
       const bounds = new google.maps.LatLngBounds();
       for (const point of points) {
         bounds.extend({ lat: point.latitude, lng: point.longitude });

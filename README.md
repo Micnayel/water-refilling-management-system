@@ -48,7 +48,7 @@ The router exposes workspaces rather than a forced screen sequence, but records 
 2. The API returns aggregated, bucketed points only; no individual customer coordinates or names.
 3. The heat layer renders on a large Google Maps panel, with a table of the same area counts as a non-map alternative.
 4. Selecting an area opens a list of every customer in that area, and **Show all** opens the same list across every area. That list comes from the Customers module, so it needs `customers:view` and keeps its masking rules.
-5. Selecting a customer address in that list opens an in-app driving-directions map from the station. The destination is the generalized area center until the exact location is revealed; coordinates never go into the URL.
+5. Selecting a customer address in that list opens an in-app driving-directions map from the station. The origin comes from **Settings → Station location**; the destination is the generalized area center until the exact location is revealed. Coordinates never go into the URL.
 6. The aggregated result downloads as CSV, Excel (`.xlsx`), or PDF; each live export is audited as `HEATMAP_EXPORT`.
 
 ### Inventory
@@ -87,7 +87,8 @@ The router exposes workspaces rather than a forced screen sequence, but records 
 1. A user opens Settings and previews the available system templates.
 2. Selecting a template saves the choice to the user's profile through the API and applies it immediately.
 3. The choice follows the user across devices; the client store only caches it.
-4. System-wide settings (such as session timeout) are visible only to users with `settings:edit` and are audited.
+4. **Station location** sets the latitude, longitude, and label used as the origin for Heat Map driving directions. It is system-wide, requires `settings:edit`, updates with optimistic concurrency, and each change is audited as `SETTINGS_UPDATE`.
+5. System-wide settings (such as session timeout) are visible only to users with `settings:edit` and are audited.
 
 ### Access, audit, and notifications
 
