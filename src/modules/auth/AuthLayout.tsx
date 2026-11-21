@@ -37,7 +37,7 @@ export function AuthLayout({
             </div>
           </div>
 
-          <div className="mt-14 max-w-md">
+          <div className="mt-10 max-w-md">
             <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.25em] text-white/70">
               Operations workspace
             </p>

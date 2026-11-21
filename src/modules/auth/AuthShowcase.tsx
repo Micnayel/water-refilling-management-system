@@ -1,90 +1,172 @@
 import type { ComponentType, SVGProps } from "react";
-import { CalendarIcon, ClipboardIcon, MapPinIcon, WalletIcon } from "@/components/ui/icons";
 
-interface Feature {
+type CharacterKind = "subscribe" | "monitor" | "schedule" | "deliver";
+
+interface ProcessStep {
   title: string;
   copy: string;
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  character: CharacterKind;
+  art: ComponentType<SVGProps<SVGSVGElement>>;
 }
 
-const FEATURES: Feature[] = [
+const stroke = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2.1,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+};
+
+/** Customer on the phone, booking a recurring refill. */
+function SubscriberArt(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 48 56" aria-hidden {...props}>
+      <g {...stroke}>
+        <circle cx="17" cy="13" r="5" fill="hsl(0 0% 100% / 0.26)" />
+        <path d="M9 27c0-4 3.6-7 8-7s8 3 8 7v12H9z" fill="hsl(0 0% 100% / 0.2)" />
+        <path d="M24 23l6-6" />
+        <rect x="30" y="10" width="7" height="11" rx="1.8" fill="hsl(var(--primary))" stroke="none" />
+        <path d="M14 39v9M20 39v9" />
+        <path d="M2 33h7v8H2z" fill="hsl(0 0% 100% / 0.18)" />
+        <path d="M4 33v-3h3v3" />
+      </g>
+      <g className="auth-char-bubble">
+        <rect x="29" y="2" width="11" height="5.5" rx="2.75" fill="hsl(var(--primary))" />
+        <circle cx="32.5" cy="4.75" r="0.9" fill="hsl(var(--primary-foreground))" />
+        <circle cx="35.5" cy="4.75" r="0.9" fill="hsl(var(--primary-foreground))" />
+        <circle cx="38.5" cy="4.75" r="0.9" fill="hsl(var(--primary-foreground))" />
+      </g>
+    </svg>
+  );
+}
+
+/** Staff watching the order board. */
+function MonitorArt(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 48 56" aria-hidden {...props}>
+      <g {...stroke}>
+        <circle cx="15" cy="14" r="5" fill="hsl(0 0% 100% / 0.26)" />
+        <path d="M7 31c0-5 3.6-8 8-8s8 3 8 8v6H7z" fill="hsl(0 0% 100% / 0.2)" />
+        <path d="M21 26l4 4" />
+        <rect x="26" y="21" width="18" height="13" rx="2" fill="hsl(0 0% 100% / 0.08)" />
+        <path d="M35 34v4M30 40h10" />
+        <rect x="3" y="40" width="42" height="3" rx="1.5" fill="hsl(0 0% 100% / 0.2)" stroke="none" />
+        <path d="M10 40l-2 9M20 40l2 9" />
+      </g>
+      <g className="auth-char-screen" fill="hsl(var(--primary))">
+        <rect x="29" y="29" width="2.5" height="3" rx="0.6" />
+        <rect x="33" y="26.5" width="2.5" height="5.5" rx="0.6" />
+        <rect x="37" y="24.5" width="2.5" height="7.5" rx="0.6" />
+      </g>
+    </svg>
+  );
+}
+
+/** Staff assigning a delivery slot on the calendar. */
+function SchedulerArt(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 48 56" aria-hidden {...props}>
+      <g {...stroke}>
+        <circle cx="14" cy="14" r="5" fill="hsl(0 0% 100% / 0.26)" />
+        <path d="M6 29c0-4 3.6-7 8-7s8 3 8 7v14H6z" fill="hsl(0 0% 100% / 0.2)" />
+        <path d="M20 23l9-7" />
+        <path d="M11 43l-2 8M19 43l2 8" />
+        <rect x="30" y="7" width="16" height="19" rx="2.5" fill="hsl(0 0% 100% / 0.08)" />
+        <path d="M30 12h16M35 5v4M41 5v4" />
+      </g>
+      <g className="auth-char-ping">
+        <circle cx="41" cy="20" r="2.4" fill="hsl(var(--primary))" />
+      </g>
+      <g fill="hsl(0 0% 100% / 0.32)">
+        <circle cx="34" cy="16" r="1.1" />
+        <circle cx="38" cy="16" r="1.1" />
+        <circle cx="42" cy="16" r="1.1" />
+        <circle cx="34" cy="22" r="1.1" />
+      </g>
+    </svg>
+  );
+}
+
+/** Delivery rider carrying a gallon to the customer. */
+function DeliveryArt(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 48 56" aria-hidden {...props}>
+      <g {...stroke}>
+        <circle cx="18" cy="13" r="5" fill="hsl(0 0% 100% / 0.26)" />
+        <path d="M12 10h13" />
+        <path d="M10 27c0-4 3.6-7 8-7s8 3 8 7v13H10z" fill="hsl(0 0% 100% / 0.2)" />
+        <path d="M25 22l4 7" />
+        <path d="M14 40l-4 9M21 40l4 9" />
+        <path d="M27 28h6v10h-6z" fill="hsl(var(--primary) / 0.35)" />
+        <path d="M29 28v-2h2v2" />
+      </g>
+      <g className="auth-char-speed" stroke="hsl(0 0% 100% / 0.45)" strokeWidth="1.6" strokeLinecap="round">
+        <path d="M2 24h6M1 30h5M3 36h5" />
+      </g>
+    </svg>
+  );
+}
+
+const PROCESS: ProcessStep[] = [
   {
-    title: "Subscriptions",
+    title: "Customer subscribes",
     copy: "Recurring refill plans stay booked week after week.",
-    icon: WalletIcon,
+    character: "subscribe",
+    art: SubscriberArt,
   },
   {
-    title: "Order monitoring",
+    title: "Staff monitor orders",
     copy: "Follow every order from placed to delivered.",
-    icon: ClipboardIcon,
+    character: "monitor",
+    art: MonitorArt,
   },
   {
-    title: "Scheduling",
+    title: "Deliveries are scheduled",
     copy: "Assign staff and time slots without clashes.",
-    icon: CalendarIcon,
+    character: "schedule",
+    art: SchedulerArt,
   },
   {
-    title: "Delivering",
+    title: "Gallon delivered",
     copy: "Completing a stop posts the stock and sale together.",
-    icon: MapPinIcon,
+    character: "deliver",
+    art: DeliveryArt,
   },
 ];
 
-const STAGES = ["Placed", "Scheduled", "Out for delivery", "Delivered"];
-
-/** Decorative operations board for the sign-in hero. */
+/** Animated operations story for the sign-in hero. */
 export function AuthShowcase() {
   return (
-    <div className="mt-8 max-w-lg">
+    <div className="mt-4 max-w-lg">
       <p className="flex items-center gap-2 text-[0.6875rem] font-semibold uppercase tracking-[0.22em] text-white/70">
         <span className="auth-live-dot" aria-hidden />
-        What the station runs on
+        How the station runs
       </p>
 
-      <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
-        {FEATURES.map(({ title, copy, icon: Icon }, index) => (
-          <div
-            key={title}
-            className="auth-feature animate-rise"
-            style={{ animationDelay: `${index * 80}ms` }}
-          >
-            <span className="auth-feature-icon">
-              <Icon className="size-4" />
+      <ol className="auth-process mt-3 space-y-1.5">
+        <span className="auth-travel" aria-hidden />
+        {PROCESS.map(({ title, copy, character, art: Art }, index) => (
+          <li key={title} className="auth-step animate-rise" style={{ animationDelay: `${index * 70}ms` }}>
+            <span className="auth-step-badge" aria-hidden>
+              {index + 1}
             </span>
-            <div>
-              <p className="text-sm font-semibold leading-tight text-white">{title}</p>
-              <p className="mt-0.5 text-xs leading-relaxed text-white/70">{copy}</p>
+            <div className="auth-step-card">
+              <span className={`auth-char auth-char--${character}`}>
+                <Art className="h-full w-full" />
+              </span>
+              <div>
+                <p className="text-sm font-semibold leading-tight text-white">{title}</p>
+                <p className="mt-0.5 text-xs leading-snug text-white/70">{copy}</p>
+              </div>
             </div>
-          </div>
+          </li>
         ))}
-      </div>
-
-      <div className="auth-tracker mt-3">
-        <div className="flex items-center justify-between text-[0.6875rem] text-white/65">
-          <span>Order monitoring</span>
-          <span className="flex items-center gap-1.5">
-            <span className="auth-live-dot" aria-hidden />
-            Live dispatch view
-          </span>
-        </div>
-        <ol className="mt-2.5 grid grid-cols-4 gap-1.5">
-          {STAGES.map((stage, index) => (
-            <li key={stage}>
-              <span
-                className="auth-stage-bar"
-                style={{ animationDelay: `${index * 1.1}s` }}
-                aria-hidden
-              />
-              <span className="mt-1.5 block text-[0.6875rem] text-white/60">{stage}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
+      </ol>
     </div>
   );
 }
 
-/** Compact capability strip for small screens where the hero is hidden. */
+/** Compact version for small screens where the hero is hidden. */
 export function AuthMobileShowcase() {
   return (
     <section className="lg:hidden" aria-label="What the system does">
@@ -92,15 +174,15 @@ export function AuthMobileShowcase() {
         Built for the station
       </p>
       <ul className="mt-2 grid grid-cols-2 gap-2">
-        {FEATURES.map(({ title, icon: Icon }) => (
+        {PROCESS.map(({ title, art: Art }) => (
           <li
             key={title}
-            className="flex items-center gap-2 rounded-lg border border-border bg-card/70 px-2.5 py-2"
+            className="flex items-center gap-2 rounded-lg border border-border bg-card/70 px-2.5 py-1.5"
           >
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <Icon className="size-3.5" />
+            <span className="flex size-9 shrink-0 items-center justify-center text-primary">
+              <Art className="h-9 w-8" />
             </span>
-            <span className="text-xs font-medium">{title}</span>
+            <span className="text-xs font-medium leading-tight">{title}</span>
           </li>
         ))}
       </ul>

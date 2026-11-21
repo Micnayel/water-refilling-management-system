@@ -753,35 +753,190 @@
     }
   }
 
-  .auth-feature {
+  .auth-process {
+    position: relative;
+  }
+
+  .auth-process::before {
+    content: "";
+    position: absolute;
+    left: 0.9375rem;
+    top: 1.5rem;
+    bottom: 1.5rem;
+    border-left: 1px dashed hsl(0 0% 100% / 0.22);
+  }
+
+  .auth-travel {
+    position: absolute;
+    left: 0.9375rem;
+    z-index: 1;
+    width: 0.375rem;
+    height: 0.375rem;
+    margin-left: -0.1875rem;
+    border-radius: 999px;
+    background-color: hsl(var(--primary));
+    box-shadow: 0 0 0 0.25rem hsl(var(--primary) / 0.22);
+    animation: auth-travel 6.4s ease-in-out infinite;
+  }
+
+  @keyframes auth-travel {
+    0% {
+      top: 1.5rem;
+      opacity: 0;
+    }
+    8% {
+      opacity: 1;
+    }
+    86% {
+      opacity: 1;
+    }
+    94%,
+    100% {
+      top: calc(100% - 1.5rem);
+      opacity: 0;
+    }
+  }
+
+  .auth-step {
+    position: relative;
+    padding-left: 2.25rem;
+  }
+
+  .auth-step-badge {
+    position: absolute;
+    left: 0;
+    top: 0.8rem;
+    z-index: 1;
     display: flex;
-    gap: 0.625rem;
-    padding: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    width: 1.875rem;
+    height: 1.875rem;
+    border-radius: 999px;
+    border: 1px solid hsl(0 0% 100% / 0.24);
+    background-color: hsl(0 0% 100% / 0.12);
+    color: #fff;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    backdrop-filter: blur(6px);
+  }
+
+  .auth-step-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem 0.5rem 0.5rem;
     border-radius: calc(var(--radius) + 4px);
     border: 1px solid hsl(0 0% 100% / 0.14);
     background-color: hsl(0 0% 100% / 0.07);
     backdrop-filter: blur(6px);
   }
 
-  .auth-feature-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
+  .auth-char {
+    display: block;
+    width: 3rem;
+    height: 3.5rem;
     flex: none;
-    border-radius: var(--radius);
-    background-color: hsl(0 0% 100% / 0.14);
-    color: #fff;
-    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.2);
+    border-radius: 999px;
+    color: hsl(0 0% 100% / 0.95);
+    background: radial-gradient(circle, hsl(var(--primary) / 0.18), transparent 68%);
+    animation: auth-bob 3.8s ease-in-out infinite;
   }
 
-  .auth-tracker {
-    padding: 0.75rem;
-    border-radius: calc(var(--radius) + 4px);
-    border: 1px solid hsl(0 0% 100% / 0.14);
-    background-color: hsl(0 0% 100% / 0.06);
-    backdrop-filter: blur(6px);
+  .auth-char--monitor {
+    animation-delay: -0.9s;
+  }
+
+  .auth-char--schedule {
+    animation-delay: -1.8s;
+  }
+
+  .auth-char--deliver {
+    animation-delay: -2.7s;
+  }
+
+  @keyframes auth-bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-3px);
+    }
+  }
+
+  .auth-char-bubble {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: auth-char-pop 3s ease-in-out infinite;
+  }
+
+  @keyframes auth-char-pop {
+    0%,
+    70%,
+    100% {
+      opacity: 0.85;
+      transform: scale(1);
+    }
+    35% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+
+  .auth-char-screen {
+    animation: auth-char-blink 2.4s steps(1, end) infinite;
+  }
+
+  @keyframes auth-char-blink {
+    0%,
+    60%,
+    100% {
+      opacity: 0.55;
+    }
+    20%,
+    80% {
+      opacity: 1;
+    }
+  }
+
+  .auth-char-ping {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: auth-char-ping 2.6s ease-out infinite;
+  }
+
+  @keyframes auth-char-ping {
+    0% {
+      opacity: 0.35;
+      transform: scale(0.8);
+    }
+    40% {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+    100% {
+      opacity: 0.35;
+      transform: scale(1);
+    }
+  }
+
+  .auth-char-speed {
+    animation: auth-char-speed 1.4s linear infinite;
+  }
+
+  @keyframes auth-char-speed {
+    from {
+      stroke-dashoffset: 14;
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 0.9;
+    }
+    to {
+      stroke-dashoffset: 0;
+      opacity: 0.35;
+    }
   }
 
   .auth-live-dot {
@@ -804,26 +959,6 @@
     }
     100% {
       box-shadow: 0 0 0 0 hsl(150 85% 62% / 0);
-    }
-  }
-
-  .auth-stage-bar {
-    display: block;
-    height: 0.1875rem;
-    border-radius: 999px;
-    background-color: hsl(0 0% 100% / 0.18);
-    animation: auth-stage 4.4s ease-in-out infinite;
-  }
-
-  @keyframes auth-stage {
-    0%,
-    62%,
-    100% {
-      background-color: hsl(0 0% 100% / 0.18);
-    }
-    8%,
-    26% {
-      background-color: hsl(0 0% 100% / 0.8);
     }
   }
 
