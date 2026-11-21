@@ -10,25 +10,27 @@ const STEPS = [
 ];
 
 describe("AuthShowcase", () => {
-  it("tells the station process in order", () => {
+  it("narrates the station workflow in order", () => {
     render(<AuthShowcase />);
-    const rendered = screen.getAllByRole("listitem").map((item) => item.textContent ?? "");
-    expect(rendered).toHaveLength(STEPS.length);
+    const captions = screen.getAllByText((_, node) => node?.className === "auth-scene-line");
+    expect(captions).toHaveLength(STEPS.length);
     STEPS.forEach((step, index) => {
-      expect(rendered[index]).toContain(step);
+      expect(captions[index]).toHaveTextContent(step);
     });
   });
 
-  it("renders a character for every step", () => {
+  it("renders the animated scene and stage track", () => {
     const { container } = render(<AuthShowcase />);
-    expect(container.querySelectorAll(".auth-char svg")).toHaveLength(STEPS.length);
-    expect(container.querySelectorAll(".auth-step-badge")).toHaveLength(STEPS.length);
+    expect(container.querySelectorAll(".auth-scene-art")).toHaveLength(1);
+    expect(container.querySelectorAll(".auth-scene-seg")).toHaveLength(STEPS.length);
+    for (const layer of ["auth-scene-customer", "auth-scene-truck", "auth-scene-staff", "auth-scene-load"]) {
+      expect(container.querySelectorAll(`.${layer}`)).toHaveLength(1);
+    }
   });
 
-  it("renders a compact version for small screens", () => {
+  it("renders the same scene for small screens", () => {
     render(<AuthMobileShowcase />);
-    for (const step of STEPS) {
-      expect(screen.getByText(step)).toBeInTheDocument();
-    }
+    expect(screen.getAllByText("Customer subscribes").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Gallon delivered").length).toBeGreaterThan(0);
   });
 });
