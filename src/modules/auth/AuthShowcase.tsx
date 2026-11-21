@@ -24,11 +24,16 @@ function SubscriberArt(props: SVGProps<SVGSVGElement>) {
       <g {...stroke}>
         <circle cx="17" cy="13" r="5" fill="hsl(0 0% 100% / 0.26)" />
         <path d="M9 27c0-4 3.6-7 8-7s8 3 8 7v12H9z" fill="hsl(0 0% 100% / 0.2)" />
-        <path d="M24 23l6-6" />
-        <rect x="30" y="10" width="7" height="11" rx="1.8" fill="hsl(var(--primary))" stroke="none" />
+        <g className="auth-char-wave">
+          <path d="M24 23l6-6" />
+          <rect x="30" y="10" width="7" height="11" rx="1.8" fill="hsl(var(--primary))" stroke="none" />
+          <rect className="auth-char-phone" x="31.5" y="12" width="4" height="1.6" rx="0.5" fill="hsl(var(--primary-foreground))" stroke="none" />
+        </g>
         <path d="M14 39v9M20 39v9" />
-        <path d="M2 33h7v8H2z" fill="hsl(0 0% 100% / 0.18)" />
-        <path d="M4 33v-3h3v3" />
+      </g>
+      <g className="auth-char-jug">
+        <path {...stroke} d="M2 32h8v9H2z" fill="hsl(0 0% 100% / 0.2)" />
+        <path {...stroke} d="M4 32v-3h3v3" />
       </g>
       <g className="auth-char-bubble">
         <rect x="29" y="2" width="11" height="5.5" rx="2.75" fill="hsl(var(--primary))" />
@@ -54,9 +59,9 @@ function MonitorArt(props: SVGProps<SVGSVGElement>) {
         <path d="M10 40l-2 9M20 40l2 9" />
       </g>
       <g className="auth-char-screen" fill="hsl(var(--primary))">
-        <rect x="29" y="29" width="2.5" height="3" rx="0.6" />
-        <rect x="33" y="26.5" width="2.5" height="5.5" rx="0.6" />
-        <rect x="37" y="24.5" width="2.5" height="7.5" rx="0.6" />
+        <rect className="auth-char-bar" style={{ animationDelay: "0ms" }} x="29" y="29" width="2.5" height="3" rx="0.6" />
+        <rect className="auth-char-bar" style={{ animationDelay: "220ms" }} x="33" y="26.5" width="2.5" height="5.5" rx="0.6" />
+        <rect className="auth-char-bar" style={{ animationDelay: "440ms" }} x="37" y="24.5" width="2.5" height="7.5" rx="0.6" />
       </g>
     </svg>
   );
@@ -69,7 +74,7 @@ function SchedulerArt(props: SVGProps<SVGSVGElement>) {
       <g {...stroke}>
         <circle cx="14" cy="14" r="5" fill="hsl(0 0% 100% / 0.26)" />
         <path d="M6 29c0-4 3.6-7 8-7s8 3 8 7v14H6z" fill="hsl(0 0% 100% / 0.2)" />
-        <path d="M20 23l9-7" />
+        <path className="auth-char-point" d="M20 23l9-7" />
         <path d="M11 43l-2 8M19 43l2 8" />
         <rect x="30" y="7" width="16" height="19" rx="2.5" fill="hsl(0 0% 100% / 0.08)" />
         <path d="M30 12h16M35 5v4M41 5v4" />
@@ -77,7 +82,7 @@ function SchedulerArt(props: SVGProps<SVGSVGElement>) {
       <g className="auth-char-ping">
         <circle cx="41" cy="20" r="2.4" fill="hsl(var(--primary))" />
       </g>
-      <g fill="hsl(0 0% 100% / 0.32)">
+      <g className="auth-char-dots" fill="hsl(0 0% 100% / 0.4)">
         <circle cx="34" cy="16" r="1.1" />
         <circle cx="38" cy="16" r="1.1" />
         <circle cx="42" cy="16" r="1.1" />
@@ -96,9 +101,12 @@ function DeliveryArt(props: SVGProps<SVGSVGElement>) {
         <path d="M12 10h13" />
         <path d="M10 27c0-4 3.6-7 8-7s8 3 8 7v13H10z" fill="hsl(0 0% 100% / 0.2)" />
         <path d="M25 22l4 7" />
-        <path d="M14 40l-4 9M21 40l4 9" />
-        <path d="M27 28h6v10h-6z" fill="hsl(var(--primary) / 0.35)" />
-        <path d="M29 28v-2h2v2" />
+        <path className="auth-char-leg auth-char-leg--a" d="M14 40l-4 9" />
+        <path className="auth-char-leg auth-char-leg--b" d="M21 40l4 9" />
+      </g>
+      <g className="auth-char-jug">
+        <path {...stroke} d="M27 28h6v10h-6z" fill="hsl(var(--primary) / 0.4)" />
+        <path {...stroke} d="M29 28v-2h2v2" />
       </g>
       <g className="auth-char-speed" stroke="hsl(0 0% 100% / 0.45)" strokeWidth="1.6" strokeLinecap="round">
         <path d="M2 24h6M1 30h5M3 36h5" />
@@ -155,7 +163,7 @@ export function AuthShowcase() {
                 <Art className="h-full w-full" />
               </span>
               <div>
-                <p className="text-sm font-semibold leading-tight text-white">{title}</p>
+                <p className="text-[0.9375rem] font-semibold leading-tight text-white">{title}</p>
                 <p className="mt-0.5 text-xs leading-snug text-white/70">{copy}</p>
               </div>
             </div>
@@ -179,8 +187,8 @@ export function AuthMobileShowcase() {
             key={title}
             className="flex items-center gap-2 rounded-lg border border-border bg-card/70 px-2.5 py-1.5"
           >
-            <span className="flex size-9 shrink-0 items-center justify-center text-primary">
-              <Art className="h-9 w-8" />
+            <span className="flex size-11 shrink-0 items-center justify-center text-primary">
+              <Art className="h-11 w-10" />
             </span>
             <span className="text-xs font-medium leading-tight">{title}</span>
           </li>

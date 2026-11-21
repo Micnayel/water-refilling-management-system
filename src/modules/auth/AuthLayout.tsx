@@ -23,6 +23,11 @@ export function AuthLayout({
       >
         <span className="auth-orb auth-orb--one" aria-hidden />
         <span className="auth-orb auth-orb--two" aria-hidden />
+        <span className="auth-bubble" style={{ left: "8%", animationDelay: "0s" }} aria-hidden />
+        <span className="auth-bubble" style={{ left: "26%", animationDelay: "-4s" }} aria-hidden />
+        <span className="auth-bubble auth-bubble--sm" style={{ left: "45%", animationDelay: "-8s" }} aria-hidden />
+        <span className="auth-bubble" style={{ left: "68%", animationDelay: "-2s" }} aria-hidden />
+        <span className="auth-bubble auth-bubble--sm" style={{ left: "84%", animationDelay: "-6s" }} aria-hidden />
 
         <div className="relative z-10">
           <div className="flex items-center gap-3">
