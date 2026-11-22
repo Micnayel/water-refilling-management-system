@@ -792,6 +792,57 @@
     }
   }
 
+  /* Supporting notes that fill tall sign-in layouts. */
+  .auth-note {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: calc(var(--radius) + 2px);
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--card) / 0.7);
+  }
+
+  .auth-note-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: hsl(var(--foreground));
+  }
+
+  .auth-note-copy {
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .hero-panel .auth-note {
+    border-color: hsl(0 0% 100% / 0.14);
+    background-color: hsl(0 0% 100% / 0.06);
+  }
+
+  .hero-panel .auth-note-title {
+    color: #fff;
+  }
+
+  .hero-panel .auth-note-copy {
+    color: hsl(0 0% 100% / 0.68);
+  }
+
+  .auth-extra {
+    display: none;
+  }
+
+  @media (min-height: 820px) {
+    .auth-extra--hero {
+      display: grid;
+    }
+
+    .auth-extra--side {
+      display: flex;
+    }
+  }
+
   /* Animated station scene used on the sign-in page. */
   .auth-scene {
     position: relative;

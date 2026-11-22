@@ -367,7 +367,7 @@ function SceneLabel({ children }: { children: ReactNode }) {
 /** Animated operations scene for the sign-in hero. */
 export function AuthShowcase() {
   return (
-    <div className="mt-4 max-w-xl">
+    <div className="mt-4 max-w-xl 2xl:max-w-2xl">
       <SceneLabel>How the station runs</SceneLabel>
       <div className="mt-2.5">
         <StationScene />

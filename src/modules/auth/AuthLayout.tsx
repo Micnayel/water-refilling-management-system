@@ -1,8 +1,45 @@
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode, SVGProps } from "react";
 import { Link } from "react-router-dom";
-import { DropletIcon, ShieldIcon } from "@/components/ui/icons";
+import {
+  CheckIcon,
+  DropletIcon,
+  EyeIcon,
+  PackageIcon,
+  ShieldIcon,
+  TrendingUpIcon,
+} from "@/components/ui/icons";
 import { brand } from "@/config/brand";
 import { AuthMobileShowcase, AuthShowcase } from "./AuthShowcase";
+
+interface HeroNote {
+  title: string;
+  copy: string;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+}
+
+const HERO_NOTES: HeroNote[] = [
+  {
+    title: "Live inventory",
+    copy: "Full, empty, and in-customer gallons at a glance.",
+    icon: PackageIcon,
+  },
+  {
+    title: "Sales in one flow",
+    copy: "Completed stops post stock and sales together.",
+    icon: TrendingUpIcon,
+  },
+  {
+    title: "Masked by default",
+    copy: "Customer details reveal only with audited permission.",
+    icon: EyeIcon,
+  },
+];
+
+const SECURITY_NOTES = [
+  "HTTP-only session with CSRF protection",
+  "Role-based access to every module",
+  "Changes leave an audit trail",
+];
 
 export function AuthLayout({
   title,
@@ -42,7 +79,7 @@ export function AuthLayout({
             </div>
           </div>
 
-          <div className="mt-10 max-w-xl">
+          <div className="mt-10 max-w-xl 2xl:max-w-2xl">
             <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.25em] text-white/70">
               Operations workspace
             </p>
@@ -51,6 +88,22 @@ export function AuthLayout({
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-white/75">{brand.productName}</p>
             <AuthShowcase />
+
+            <div className="auth-extra auth-extra--hero mt-8 grid-cols-3 gap-2">
+              {HERO_NOTES.map(({ title: noteTitle, copy, icon: Icon }, index) => (
+                <div
+                  key={noteTitle}
+                  className="auth-note animate-rise"
+                  style={{ animationDelay: `${index * 70}ms` }}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Icon className="size-3.5" />
+                    <span className="auth-note-title">{noteTitle}</span>
+                  </span>
+                  <span className="auth-note-copy">{copy}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -84,6 +137,21 @@ export function AuthLayout({
           </div>
 
           <AuthMobileShowcase />
+
+          <div className="auth-extra auth-extra--side auth-note animate-rise">
+            <p className="flex items-center gap-2">
+              <ShieldIcon className="size-4 text-primary" />
+              <span className="auth-note-title">Protected by design</span>
+            </p>
+            <ul className="mt-2 space-y-1.5">
+              {SECURITY_NOTES.map((note) => (
+                <li key={note} className="flex items-start gap-1.5">
+                  <CheckIcon className="mt-0.5 size-3 shrink-0 text-primary" />
+                  <span className="auth-note-copy">{note}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           <p className="text-center text-xs text-muted-foreground">
             <Link to="/login" className="transition-colors hover:text-foreground">
