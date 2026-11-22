@@ -225,6 +225,7 @@ tests/
 | Module | Folder | Backend routes |
 | --- | --- | --- |
 | Login and Registration | `src/modules/auth/` | `backend/src/modules/auth/routes.ts` |
+| Marketing landing | `src/modules/landing/` | none (public, display-only) |
 | Dashboard | `src/modules/dashboard/` | `backend/src/modules/dashboard/routes.ts` |
 | Heat Map | `src/modules/heat-map/` | `backend/src/modules/heat-map/routes.ts` |
 | Inventory | `src/modules/inventory/` | `backend/src/modules/inventory/routes.ts` |
@@ -256,6 +257,7 @@ Permissions use the `module:view|add|edit|delete` grant format, matching AGENTS.
 
 | Area | Route | Permission |
 | --- | --- | --- |
+| Marketing landing | `/welcome` | Public (no grant; display-only) |
 | Dashboard | `/` | `dashboard:view` |
 | Heat Map | `/heat-map` | `heatmap:view` |
 | Inventory | `/inventory` | `inventory:view` |
@@ -282,7 +284,7 @@ Permissions use the `module:view|add|edit|delete` grant format, matching AGENTS.
 | Notifications | `/notifications` | `notifications:view` |
 | Settings | `/settings` | `settings:view` |
 
-The public routes are `/login` and `/register`. The authenticated route tree includes a catch-all not-found page; denied access is rendered by `ProtectedRoute` within a protected route, not by a separate `/403` route. Every signed-in user may open `/settings` to choose their own template.
+The public routes are `/login`, `/register`, and the display-only marketing page at `/welcome`. The authenticated route tree includes a catch-all not-found page; denied access is rendered by `ProtectedRoute` within a protected route, not by a separate `/403` route. Every signed-in user may open `/settings` to choose their own template.
 
 ### Adding or moving a route
 

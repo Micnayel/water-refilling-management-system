@@ -286,3 +286,83 @@ export function ArrowRightIcon(props: IconProps) {
     </Svg>
   );
 }
+
+export function TruckIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z" />
+      <circle cx="7" cy="18" r="2" />
+      <circle cx="17.5" cy="18" r="2" />
+      <path d="M9 18h6.5" />
+    </Svg>
+  );
+}
+
+export function SmartphoneIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="7" y="2.5" width="10" height="19" rx="2.5" />
+      <path d="M10.5 5.5h3M11 18.5h2" />
+    </Svg>
+  );
+}
+
+export function RefreshIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M20 11a8 8 0 10-2.6 6" />
+      <path d="M20 4v7h-7" />
+    </Svg>
+  );
+}
+
+export function NavigationIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 3l9 18-9-4-9 4 9-18z" />
+    </Svg>
+  );
+}
+
+export function PlayIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M8 5.5l11 6.5-11 6.5z" />
+    </Svg>
+  );
+}
+
+export function PauseIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M9 5v14M15 5v14" />
+    </Svg>
+  );
+}
+
+export function FacebookIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M14.5 8.5h2.5V5h-2.5A4.5 4.5 0 0010 9.5V12H7.5v3.5H10V21h3.5v-5.5h2.8l.7-3.5h-3.5V9.5a1 1 0 011-1z" />
+    </Svg>
+  );
+}
+
+export function InstagramIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17" cy="7" r="0.8" fill="currentColor" stroke="none" />
+    </Svg>
+  );
+}
+
+export function MailIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path d="M4 7l8 6 8-6" />
+    </Svg>
+  );
+}

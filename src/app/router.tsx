@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { LoginPage, RegisterPage } from "@/modules/auth";
+import { LandingPage } from "@/modules/landing";
 import { DashboardPage } from "@/modules/dashboard";
 import { HeatMapPage } from "@/modules/heat-map";
 import {
@@ -44,6 +45,7 @@ function guard(permission: string, element: ReactNode) {
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
+  { path: "/welcome", element: <LandingPage /> },
   {
     element: (
       <ProtectedRoute>
