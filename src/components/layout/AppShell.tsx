@@ -8,10 +8,12 @@ import {
   BellIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  DashboardIcon,
   DropletIcon,
   InfoIcon,
   LogOutIcon,
   MenuIcon,
+  TruckIcon,
   XIcon,
 } from "@/components/ui/icons";
 import { Toaster } from "@/components/ui/toaster";
@@ -37,6 +39,7 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
   const user = useSessionStore((state) => state.user);
   const navigate = useNavigate();
   const logout = useLogoutMutation();
+  const preview = isPreviewMode();
 
   const onLogout = async () => {
     try {
@@ -89,6 +92,32 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
             </div>
           );
         })}
+
+        {preview ? (
+          <div className="mb-4">
+            {!collapsed ? (
+              <p className="mb-1.5 px-2.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70">
+                Design preview
+              </p>
+            ) : (
+              <div className="mx-auto mb-2 h-px w-6 bg-foreground/10" aria-hidden="true" />
+            )}
+            <div className="space-y-0.5">
+              <NavLink to="/portal" onClick={onNavigate} className="nav-pill">
+                <DropletIcon className="size-4 shrink-0" />
+                <span className="truncate">Customer portal</span>
+              </NavLink>
+              <NavLink to="/overview" onClick={onNavigate} className="nav-pill">
+                <DashboardIcon className="size-4 shrink-0" />
+                <span className="truncate">Admin workspace</span>
+              </NavLink>
+              <NavLink to="/dispatch" onClick={onNavigate} className="nav-pill">
+                <TruckIcon className="size-4 shrink-0" />
+                <span className="truncate">Delivery workspace</span>
+              </NavLink>
+            </div>
+          </div>
+        ) : null}
       </nav>
 
       {!collapsed ? (
@@ -260,6 +289,34 @@ export function AppShell() {
                   </Badge>
                 </div>
                 <div className="pt-1">
+                  {preview ? (
+                    <>
+                      <Link
+                        to="/portal"
+                        role="menuitem"
+                        className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-foreground/10"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Customer portal
+                      </Link>
+                      <Link
+                        to="/overview"
+                        role="menuitem"
+                        className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-foreground/10"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Admin workspace
+                      </Link>
+                      <Link
+                        to="/dispatch"
+                        role="menuitem"
+                        className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-foreground/10"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Delivery workspace
+                      </Link>
+                    </>
+                  ) : null}
                   <Link
                     to="/settings"
                     role="menuitem"

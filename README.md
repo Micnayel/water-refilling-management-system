@@ -233,6 +233,7 @@ tests/
 | Scheduling | `src/modules/scheduling/` | `backend/src/modules/scheduling/routes.ts` |
 | User Management | `src/modules/users/` | `backend/src/modules/users/routes.ts` |
 | Settings | `src/modules/settings/` | `backend/src/modules/settings/routes.ts` |
+| Design preview workspaces | `src/modules/workspace/` | None (synthetic, preview-only) |
 
 ### Component ownership
 
@@ -283,6 +284,11 @@ Permissions use the `module:view|add|edit|delete` grant format, matching AGENTS.
 | System maintenance | `/administration/system-maintenance` | `admin:view` |
 | Notifications | `/notifications` | `notifications:view` |
 | Settings | `/settings` | `settings:view` |
+| Customer portal (preview) | `/portal`, `/portal/subscription`, `/portal/order`, `/portal/history`, `/portal/tracking`, `/portal/profile`, `/portal/notifications` | Signed in; preview build only |
+| Admin workspace (preview) | `/overview`, `/overview/orders`, `/overview/subscriptions`, `/overview/deliveries`, `/overview/tracking` | Signed in; preview build only |
+| Delivery workspace (preview) | `/dispatch`, `/dispatch/history`, `/dispatch/customers`, `/dispatch/notifications`, `/dispatch/profile` | Signed in; preview build only |
+
+The three workspace route trees render only when `VITE_PREVIEW_DATA=true`. They read the synthetic store in `src/modules/workspace/` and never call the API. In a production build the links are hidden and the routes redirect to `/`, so the existing API-backed modules remain the source of truth. Admin and delivery navigation also links to the live Customers, Inventory, Reports, Users, and Settings modules.
 
 The public routes are `/login`, `/register`, and the display-only marketing page at `/welcome`. The authenticated route tree includes a catch-all not-found page; denied access is rendered by `ProtectedRoute` within a protected route, not by a separate `/403` route. Every signed-in user may open `/settings` to choose their own template.
 
@@ -392,6 +398,15 @@ Page
 - Route and API: `/settings` and `backend/src/modules/settings/routes.ts`.
 - Rules: Any signed-in user may read and change their own template. Templates are named presets in `src/config/` that only swap design-token values. The default is Vision Glass (deep navy glass with a green-to-teal gradient); Aqua Light keeps the original light palette, followed by Deep Ocean, Warm Sunrise, Forest Spring, and Midnight. Changes to `data-theme` are local only, and templates never hardcode colors in components. The choice is stored per user through the API and cached in the client preferences store; it contains no sensitive data. System-wide settings require `settings:edit`.
 - Audit events: `SETTINGS_UPDATE`.
+
+#### Design preview workspaces
+
+- Routes: `/portal` (customer), `/overview` (administrator), and `/dispatch` (delivery personnel). All three require a signed-in session and render only when `VITE_PREVIEW_DATA=true`.
+- Data: `src/modules/workspace/data.ts` holds synthetic customers, plans, subscriptions, orders, deliveries, transactions, notifications, inventory, registrations, and revenue points. `store.ts` holds them in a Zustand store so demo actions (place or cancel an order, confirm an order, pause or skip a subscription, change a plan, advance a delivery, approve a registration, reveal contact, edit a profile) are real within the session.
+- Design: one shared `WorkspaceLayout`, status pill, stat card, table, timeline, chart, notification, dialog, and tracking component set, styled by `workspace.css` on the existing tokens. The workspace applies the light Aqua template while mounted and restores the previous template on exit.
+- Tracking: the map is a deliberately stylised SVG route, labelled "Simulated route preview — not live GPS". It never requests Google Maps, never displays coordinates, and offers a text alternative for keyboard and screen-reader users.
+- Privacy: contact numbers are masked until revealed; reveals and profile edits are local preview actions and are not written to the API or the audit trail.
+- Production: the routes redirect to `/` and the navigation entries are hidden. Enabling these screens for real customers, riders, and subscriptions needs new backend tables, grants, and audit events, which remain open work.
 
 ## Security and sensitive-data rules
 

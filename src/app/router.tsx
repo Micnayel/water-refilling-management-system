@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { LoginPage, RegisterPage } from "@/modules/auth";
@@ -36,10 +36,39 @@ import {
   UserNewPage,
 } from "@/modules/users";
 import { SettingsPage, SystemMaintenancePage } from "@/modules/settings";
+import {
+  AdminDeliveries,
+  AdminOrders,
+  AdminOverview,
+  AdminSubscriptions,
+  AdminTracking,
+  CustomerDashboard,
+  CustomerHistory,
+  CustomerOrder,
+  CustomerSubscription,
+  CustomerTracking,
+  PreviewOnlyRoute,
+  ProfilePage,
+  RiderCustomers,
+  RiderDeliveries,
+  RiderHistory,
+  WorkspaceLayout,
+  WorkspaceNotificationsPage,
+} from "@/modules/workspace";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 
 function guard(permission: string, element: ReactNode) {
   return <ProtectedRoute grant={permission}>{element}</ProtectedRoute>;
+}
+
+function workspace(role: "customer" | "admin" | "rider") {
+  return (
+    <ProtectedRoute>
+      <PreviewOnlyRoute>
+        <WorkspaceLayout role={role} />
+      </PreviewOnlyRoute>
+    </ProtectedRoute>
+  );
 }
 
 export const router = createBrowserRouter([
@@ -103,6 +132,46 @@ export const router = createBrowserRouter([
 
       { path: "settings", element: guard("settings:view", <SettingsPage />) },
       { path: "*", element: <NotFoundPage /> },
+    ],
+  },
+  {
+    path: "/portal",
+    element: workspace("customer"),
+    children: [
+      { index: true, element: <CustomerDashboard /> },
+      { path: "subscription", element: <CustomerSubscription /> },
+      { path: "order", element: <CustomerOrder /> },
+      { path: "history", element: <CustomerHistory /> },
+      { path: "tracking", element: <CustomerTracking /> },
+      { path: "profile", element: <ProfilePage role="customer" /> },
+      { path: "notifications", element: <WorkspaceNotificationsPage role="customer" /> },
+      { path: "*", element: <Navigate to="/portal" replace /> },
+    ],
+  },
+  {
+    path: "/overview",
+    element: workspace("admin"),
+    children: [
+      { index: true, element: <AdminOverview /> },
+      { path: "orders", element: <AdminOrders /> },
+      { path: "subscriptions", element: <AdminSubscriptions /> },
+      { path: "deliveries", element: <AdminDeliveries /> },
+      { path: "tracking", element: <AdminTracking /> },
+      { path: "profile", element: <ProfilePage role="admin" /> },
+      { path: "notifications", element: <WorkspaceNotificationsPage role="admin" /> },
+      { path: "*", element: <Navigate to="/overview" replace /> },
+    ],
+  },
+  {
+    path: "/dispatch",
+    element: workspace("rider"),
+    children: [
+      { index: true, element: <RiderDeliveries /> },
+      { path: "history", element: <RiderHistory /> },
+      { path: "customers", element: <RiderCustomers /> },
+      { path: "notifications", element: <WorkspaceNotificationsPage role="rider" /> },
+      { path: "profile", element: <ProfilePage role="rider" /> },
+      { path: "*", element: <Navigate to="/dispatch" replace /> },
     ],
   },
 ]);
