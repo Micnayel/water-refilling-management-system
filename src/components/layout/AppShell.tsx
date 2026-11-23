@@ -63,9 +63,9 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
         </span>
         {!collapsed ? (
           <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold tracking-tight">{brand.shortName}</span>
-            <span className="block truncate text-[0.625rem] uppercase tracking-[0.18em] text-muted-foreground">
-              Management
+            <span className="block truncate text-[0.8125rem] font-bold tracking-tight">{brand.shortName}</span>
+            <span className="block truncate text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {brand.stationName}
             </span>
           </span>
         ) : null}
@@ -137,7 +137,7 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
               <button
                 type="button"
                 aria-label="Sign out"
-                className="btn-reset rounded-md p-1 text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground"
+                className="btn-reset rounded-md p-1 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground"
                 onClick={() => void onLogout()}
               >
                 <LogOutIcon className="size-4" />
@@ -224,7 +224,7 @@ export function AppShell() {
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-foreground/10 bg-background/70 px-3 backdrop-blur-xl lg:px-5">
+        <header className="app-topbar sticky top-0 z-20 flex h-14 items-center gap-2 border-b px-3 lg:px-5">
           <Button
             variant="ghost"
             size="icon"
@@ -244,7 +244,7 @@ export function AppShell() {
             {sidebarCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
           </Button>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground/70">
+            <p className="truncate text-[0.625rem] font-bold uppercase tracking-[0.18em] text-primary/80">
               {activeGroup}
             </p>
             <p className="truncate text-sm font-semibold leading-tight">{activeLabel}</p>
@@ -265,7 +265,7 @@ export function AppShell() {
           <div className="relative">
             <button
               type="button"
-              className="btn-reset flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/[0.04] p-0.5 pr-2.5 transition-colors hover:border-foreground/25 hover:bg-foreground/10"
+              className="btn-reset flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/[0.04] p-0.5 pr-2.5 transition-colors hover:border-foreground/25 hover:bg-primary/10"
               aria-haspopup="menu"
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((open) => !open)}
@@ -294,7 +294,7 @@ export function AppShell() {
                       <Link
                         to="/portal"
                         role="menuitem"
-                        className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-foreground/10"
+                        className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-primary/10"
                         onClick={() => setMenuOpen(false)}
                       >
                         Customer portal
@@ -302,7 +302,7 @@ export function AppShell() {
                       <Link
                         to="/overview"
                         role="menuitem"
-                        className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-foreground/10"
+                        className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-primary/10"
                         onClick={() => setMenuOpen(false)}
                       >
                         Admin workspace
@@ -310,7 +310,7 @@ export function AppShell() {
                       <Link
                         to="/dispatch"
                         role="menuitem"
-                        className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-foreground/10"
+                        className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-primary/10"
                         onClick={() => setMenuOpen(false)}
                       >
                         Delivery workspace
@@ -320,7 +320,7 @@ export function AppShell() {
                   <Link
                     to="/settings"
                     role="menuitem"
-                    className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-foreground/10"
+                    className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-primary/10"
                     onClick={() => setMenuOpen(false)}
                   >
                     Settings
@@ -328,7 +328,7 @@ export function AppShell() {
                   <button
                     type="button"
                     role="menuitem"
-                    className="btn-reset flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-foreground/10"
+                    className="btn-reset flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-primary/10"
                     onClick={() => void onLogout()}
                   >
                     <LogOutIcon /> Sign out

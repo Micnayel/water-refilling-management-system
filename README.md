@@ -396,7 +396,7 @@ Page
 #### Settings
 
 - Route and API: `/settings` and `backend/src/modules/settings/routes.ts`.
-- Rules: Any signed-in user may read and change their own template. Templates are named presets in `src/config/` that only swap design-token values. The default is Vision Glass (deep navy glass with a green-to-teal gradient); Aqua Light keeps the original light palette, followed by Deep Ocean, Warm Sunrise, Forest Spring, and Midnight. Changes to `data-theme` are local only, and templates never hardcode colors in components. The choice is stored per user through the API and cached in the client preferences store; it contains no sensitive data. System-wide settings require `settings:edit`.
+- Rules: Any signed-in user may read and change their own template. Templates are named presets in `src/config/` that only swap design-token values. The default is Aqua Signature, which carries the landing page palette (white surfaces, deep ocean blue, aqua accents) into the workspace; Aqua Light keeps the original light palette, followed by Deep Ocean, Warm Sunrise, Forest Spring, and Midnight. Changes to `data-theme` are local only, and templates never hardcode colors in components. The choice is stored per user through the API and cached in the client preferences store; it contains no sensitive data. System-wide settings require `settings:edit`.
 - Audit events: `SETTINGS_UPDATE`.
 
 #### Design preview workspaces

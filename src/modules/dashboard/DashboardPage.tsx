@@ -286,7 +286,7 @@ export function DashboardPage() {
       </div>
 
       <Card>
-        <CardHeader className="flex-row items-start justify-between gap-2">
+        <CardHeader className="flex-col items-start gap-2 sm:flex-row sm:justify-between">
           <div>
             <CardTitle className="flex items-center gap-1.5 text-base">
               <MapPinIcon className="size-4 text-primary" /> Customer locations
@@ -295,7 +295,7 @@ export function DashboardPage() {
               Pins are grouped by barangay and rounded. Exact locations need an audited reveal.
             </p>
           </div>
-          <Link to="/heat-map" className="hero-action hero-action--solid">
+          <Link to="/heat-map" className="hero-action hero-action--solid shrink-0">
             <MapIcon className="size-3.5" /> Open heat map
           </Link>
         </CardHeader>

@@ -257,7 +257,7 @@ export function WorkspaceLayout({ role }: { role: WorkspaceRole }) {
     const root = document.documentElement;
     const previousTheme = root.dataset.theme;
     const previousBs = root.dataset.bsTheme;
-    root.dataset.theme = "aqua";
+    root.dataset.theme = "default";
     root.dataset.bsTheme = "light";
     return () => {
       if (previousTheme) root.dataset.theme = previousTheme;

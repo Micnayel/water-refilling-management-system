@@ -23,10 +23,10 @@ describe("system templates", () => {
     expect(document.documentElement.dataset.bsTheme).toBe("dark");
   });
 
-  it("uses the dark Vision palette as the default", () => {
+  it("uses the light Aqua Signature palette as the default", () => {
     applyTemplate("default");
     expect(document.documentElement.dataset.theme).toBe("default");
-    expect(document.documentElement.dataset.bsTheme).toBe("dark");
+    expect(document.documentElement.dataset.bsTheme).toBe("light");
     expect(DEFAULT_TEMPLATE_ID).toBe("default");
   });
 
@@ -42,6 +42,6 @@ describe("system templates", () => {
 
   it("returns a readable template name", () => {
     expect(templateName("forest")).toBe("Forest Spring");
-    expect(templateName("neon")).toBe("Vision Glass");
+    expect(templateName("neon")).toBe("Aqua Signature");
   });
 });

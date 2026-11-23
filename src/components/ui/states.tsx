@@ -12,10 +12,10 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-2 p-8 text-center">
-      <span className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+      <span className="flex size-11 items-center justify-center rounded-2xl bg-accent text-accent-foreground ring-1 ring-border/60">
         <InfoIcon className="size-5" />
       </span>
-      <p className="text-sm font-medium">{title}</p>
+      <p className="text-sm font-semibold">{title}</p>
       {description ? <p className="max-w-md text-xs text-muted-foreground">{description}</p> : null}
       {action}
     </div>
@@ -33,10 +33,10 @@ export function ErrorState({
 }) {
   return (
     <div role="alert" className="flex flex-col items-center justify-center gap-2 p-8 text-center">
-      <span className="flex size-10 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+      <span className="flex size-11 items-center justify-center rounded-2xl bg-destructive/10 text-destructive ring-1 ring-destructive/20">
         <AlertTriangleIcon className="size-5" />
       </span>
-      <p className="text-sm font-medium">{title}</p>
+      <p className="text-sm font-semibold">{title}</p>
       <p className="max-w-md text-xs text-muted-foreground">{description}</p>
       {action}
     </div>

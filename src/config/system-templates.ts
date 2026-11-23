@@ -7,8 +7,8 @@ export interface SystemTemplate {
 export const SYSTEM_TEMPLATES: SystemTemplate[] = [
   {
     id: "default",
-    name: "Vision Glass",
-    description: "Deep navy glass surfaces with a green-to-teal brand gradient.",
+    name: "Aqua Signature",
+    description: "The landing page look: white surfaces, deep ocean blue, and aqua accents.",
   },
   {
     id: "aqua",
@@ -49,10 +49,9 @@ export function applyTemplate(id: string): void {
   document.documentElement.dataset.theme = template;
   // Keep Bootstrap component internals (carets, shadows, light-dark tokens) in
   // sync with the template without hardcoding colors in any component.
-  document.documentElement.dataset.bsTheme =
-    template === "midnight" || template === "default" ? "dark" : "light";
+  document.documentElement.dataset.bsTheme = template === "midnight" ? "dark" : "light";
 }
 
 export function templateName(id: string): string {
-  return SYSTEM_TEMPLATES.find((template) => template.id === id)?.name ?? "Vision Glass";
+  return SYSTEM_TEMPLATES.find((template) => template.id === id)?.name ?? "Aqua Signature";
 }

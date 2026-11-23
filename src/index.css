@@ -3,9 +3,61 @@
 @tailwind utilities;
 
 @layer base {
-  /* Light palette, used by the Aqua Light template and as the neutral
-     fallback. The default template overrides these with the Vision palette. */
+  /* Aqua Signature (default) — the landing page palette: clean white surfaces,
+     deep ocean blue, aqua accents, soft glow, and generous rounding. It is also
+     the neutral fallback so the first paint matches the applied template. */
   :root {
+    --background: 203 100% 98%;
+    --foreground: 208 85% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 208 85% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 208 85% 16%;
+    --primary: 207 86% 39%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 203 55% 95%;
+    --secondary-foreground: 209 50% 22%;
+    --muted: 205 45% 95%;
+    --muted-foreground: 208 26% 42%;
+    --accent: 198 88% 92%;
+    --accent-foreground: 209 87% 26%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 172 84% 33%;
+    --warning: 32 100% 32%;
+    --border: 205 40% 88%;
+    --input: 205 40% 88%;
+    --ring: 199 84% 33%;
+    --radius: 0.75rem;
+    --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+
+    /* Derived design tokens. Templates only swap the values above. */
+    --radius-card: 1.25rem;
+    --radius-pill: 999px;
+    --shadow-card: 0 1px 2px hsl(208 85% 16% / 0.04), 0 18px 40px -26px hsl(208 85% 16% / 0.3);
+    --shadow-raised: 0 3px 6px hsl(208 85% 16% / 0.05), 0 28px 60px -26px hsl(208 85% 16% / 0.38);
+    /* Deep enough on every stop for white button and nav text to stay legible. */
+    --gradient-brand: linear-gradient(135deg, #083b6b 0%, #0a4d8c 48%, #0e6bb8 100%);
+    --gradient-sheen: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.4) 100%);
+    --gradient-icon-1: linear-gradient(135deg, #0e6bb8 0%, #21b6e0 100%);
+    --gradient-icon-2: linear-gradient(135deg, #0e9c8a 0%, #38d6b0 100%);
+    --gradient-icon-3: linear-gradient(135deg, #f0aa28 0%, #f97316 100%);
+    --gradient-icon-4: linear-gradient(135deg, #0a4d8c 0%, #1289d6 100%);
+    --glass-blur: 0px;
+    --glass-border: hsl(207 45% 88% / 0.9);
+    --glass-sheen: hsl(0 0% 100% / 0);
+    --chart-grid: hsl(var(--border) / 0.6);
+    --nav-active-bg: var(--gradient-brand);
+    --nav-active-fg: #fff;
+    --nav-active-glow: 0 12px 24px -14px hsl(207 86% 39% / 0.75);
+    --hero-gradient: linear-gradient(150deg, #062f52 0%, #031c33 52%, #021424 100%);
+    --chart-1: #0e6bb8;
+    --chart-2: #0e9c8a;
+    --chart-3: #f0aa28;
+  }
+
+  /* Aqua Light keeps the earlier cool, neutral blue workspace. */
+  [data-theme="aqua"] {
     --background: 210 20% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
@@ -28,30 +80,6 @@
     --input: 214 20% 88%;
     --ring: 205 90% 35%;
     --radius: 0.5rem;
-    --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
-
-    /* Derived design tokens. Templates only swap the values above. */
-    --radius-card: 0.875rem;
-    --radius-pill: 999px;
-    --shadow-card: 0 1px 2px hsl(var(--foreground) / 0.05), 0 14px 34px -24px hsl(var(--foreground) / 0.35);
-    --shadow-raised: 0 3px 6px hsl(var(--foreground) / 0.06), 0 22px 48px -22px hsl(var(--foreground) / 0.4);
-    --gradient-brand: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-foreground)) 100%);
-    --gradient-sheen: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.55) 100%);
-    --gradient-icon-1: linear-gradient(310deg, hsl(var(--primary)) 0%, hsl(var(--accent-foreground)) 100%);
-    --gradient-icon-2: linear-gradient(310deg, hsl(var(--success)) 0%, hsl(var(--primary)) 100%);
-    --gradient-icon-3: linear-gradient(310deg, hsl(var(--warning)) 0%, hsl(var(--destructive)) 100%);
-    --gradient-icon-4: linear-gradient(310deg, hsl(var(--accent-foreground)) 0%, hsl(var(--primary)) 100%);
-    --glass-blur: 0px;
-    --glass-border: hsl(var(--border) / 0.85);
-    --glass-sheen: hsl(0 0% 100% / 0);
-    --chart-grid: hsl(var(--border) / 0.6);
-    --nav-active-bg: linear-gradient(0deg, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.12));
-    --nav-active-fg: hsl(var(--primary));
-    --nav-active-glow: none;
-    --hero-gradient: linear-gradient(150deg, hsl(var(--primary)) 0%, hsl(var(--accent-foreground)) 100%);
-    --chart-1: hsl(var(--primary));
-    --chart-2: hsl(var(--success));
-    --chart-3: hsl(var(--warning));
   }
 
   [data-theme="ocean"] {
@@ -154,54 +182,6 @@
     --radius: 0.5rem;
   }
 
-  /* Vision: deep navy glass workspace with a green→teal brand gradient.
-     This is the default template. */
-  [data-theme="default"] {
-    --background: 229 62% 11%;
-    --foreground: 220 40% 97%;
-    --card: 229 38% 16%;
-    --card-foreground: 220 40% 97%;
-    --popover: 229 38% 16%;
-    --popover-foreground: 220 40% 97%;
-    --primary: 157 62% 49%;
-    --primary-foreground: 229 55% 10%;
-    --secondary: 228 30% 22%;
-    --secondary-foreground: 220 30% 92%;
-    --muted: 228 30% 20%;
-    --muted-foreground: 216 18% 68%;
-    --accent: 267 60% 30%;
-    --accent-foreground: 264 90% 84%;
-    --destructive: 358 88% 66%;
-    --destructive-foreground: 229 55% 10%;
-    --success: 157 62% 49%;
-    --warning: 36 96% 62%;
-    --border: 228 24% 28%;
-    --input: 228 24% 28%;
-    --ring: 157 72% 55%;
-    --radius: 0.5rem;
-
-    --radius-card: 1rem;
-    --shadow-card: 0 8px 28px -18px hsl(229 70% 4% / 0.9), 0 1px 0 hsl(0 0% 100% / 0.04) inset;
-    --shadow-raised: 0 18px 48px -22px hsl(229 80% 3% / 0.95), 0 1px 0 hsl(0 0% 100% / 0.05) inset;
-    --gradient-brand: linear-gradient(310deg, #2dce89 0%, #2dcecc 100%);
-    --gradient-sheen: linear-gradient(180deg, hsl(229 40% 19%) 0%, hsl(229 40% 15%) 100%);
-    --gradient-icon-1: linear-gradient(310deg, #2dce89 0%, #2dcecc 100%);
-    --gradient-icon-2: linear-gradient(310deg, #2152ff 0%, #21d4fd 100%);
-    --gradient-icon-3: linear-gradient(310deg, #fb6340 0%, #fbb140 100%);
-    --gradient-icon-4: linear-gradient(310deg, #7928ca 0%, #ff0080 100%);
-    --glass-blur: 14px;
-    --glass-border: hsl(0 0% 100% / 0.11);
-    --glass-sheen: hsl(0 0% 100% / 0.045);
-    --chart-grid: hsl(0 0% 100% / 0.08);
-    --nav-active-bg: linear-gradient(310deg, #2dce89 0%, #2dcecc 100%);
-    --nav-active-fg: hsl(229 55% 10%);
-    --nav-active-glow: 0 10px 24px -14px hsl(160 70% 50% / 0.9);
-    --hero-gradient: linear-gradient(310deg, hsl(262 70% 26%) 0%, hsl(229 55% 18%) 48%, hsl(176 70% 26%) 100%);
-    --chart-1: #2dce89;
-    --chart-2: #21d4fd;
-    --chart-3: #fbb140;
-  }
-
   * {
     @apply border-border;
   }
@@ -211,10 +191,6 @@
   }
 
   [data-theme="midnight"] {
-    color-scheme: dark;
-  }
-
-  [data-theme="default"] {
     color-scheme: dark;
   }
 
@@ -347,13 +323,17 @@
 
 @layer components {
   .card-surface {
-    @apply rounded-xl text-card-foreground;
+    @apply text-card-foreground;
     background-color: hsl(var(--card));
-    background-image: linear-gradient(180deg, var(--glass-sheen), transparent 42%);
+    background-image: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.35) 100%);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
     backdrop-filter: blur(var(--glass-blur));
+    transition:
+      border-color 200ms ease,
+      box-shadow 200ms ease,
+      transform 200ms ease;
   }
 
   .compact-input {
@@ -381,45 +361,58 @@
     cursor: pointer;
   }
 
-  /* App canvas */
+  /* App canvas — soft aqua light wash borrowed from the landing hero. */
   .app-canvas {
     background-color: hsl(var(--background));
     background-image:
-      radial-gradient(58rem 40rem at 92% -12%, hsl(var(--primary) / 0.16), transparent 62%),
-      radial-gradient(46rem 34rem at -8% 4%, hsl(268 80% 58% / 0.12), transparent 60%),
-      radial-gradient(42rem 30rem at 55% 112%, hsl(var(--accent-foreground) / 0.1), transparent 62%);
+      radial-gradient(60% 80% at 6% 0%, rgba(56, 214, 245, 0.14), transparent 62%),
+      radial-gradient(50% 70% at 96% 8%, rgba(14, 107, 184, 0.1), transparent 60%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 46%, hsl(var(--card)) 100%);
     background-attachment: fixed;
   }
 
   .app-sidebar {
-    background-color: hsl(var(--card));
+    background-color: hsl(var(--card) / 0.86);
     background-image:
-      linear-gradient(180deg, hsl(var(--card) / 0.92) 0%, hsl(var(--background) / 0.96) 100%),
-      radial-gradient(22rem 18rem at 10% 0%, hsl(var(--primary) / 0.16), transparent 70%);
-    border-color: var(--glass-border);
-    backdrop-filter: blur(var(--glass-blur));
+      linear-gradient(180deg, hsl(var(--card) / 0.96) 0%, hsl(var(--background) / 0.9) 100%),
+      radial-gradient(22rem 18rem at 8% 0%, hsl(var(--primary) / 0.14), transparent 70%);
+    border-color: hsl(var(--border) / 0.8);
+    backdrop-filter: blur(18px) saturate(150%);
+  }
+
+  .app-topbar {
+    background-color: hsl(var(--card) / 0.72);
+    border-color: hsl(var(--border) / 0.75);
+    backdrop-filter: blur(18px) saturate(160%);
+  }
+
+  /* Optional landing-style eyebrow rule beside a page title. */
+  .page-header-accent {
+    background-image: linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(var(--ring)) 100%);
+    box-shadow: 0 0 0 4px hsl(var(--primary) / 0.07);
   }
 
   .brand-mark {
     background-image: var(--gradient-brand);
     color: hsl(var(--primary-foreground));
+    border-radius: 0.85rem;
     box-shadow: 0 10px 26px -12px hsl(var(--primary) / 0.85), inset 0 1px 0 hsl(0 0% 100% / 0.35);
   }
 
   .nav-pill {
     position: relative;
-    @apply flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-muted-foreground transition-all duration-150;
+    @apply flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm text-muted-foreground transition-all duration-150;
   }
 
   .nav-pill:hover {
     @apply text-foreground;
-    background-color: hsl(var(--foreground) / 0.05);
+    background-color: hsl(var(--primary) / 0.08);
   }
 
   .nav-pill[aria-current="page"] {
     background-image: var(--nav-active-bg);
     color: var(--nav-active-fg);
-    font-weight: 600;
+    font-weight: 650;
     box-shadow: var(--nav-active-glow);
   }
 
@@ -430,7 +423,7 @@
   .stat-card {
     position: relative;
     overflow: hidden;
-    transition: box-shadow 180ms ease, transform 180ms ease;
+    transition: box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease;
   }
 
   .stat-card::after {
@@ -440,19 +433,20 @@
     width: 9rem;
     height: 9rem;
     border-radius: 999px;
-    background-image: radial-gradient(circle, hsl(var(--primary) / 0.16), transparent 70%);
+    background-image: radial-gradient(circle, hsl(var(--ring) / 0.2), transparent 70%);
     pointer-events: none;
   }
 
   .stat-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    border-color: hsl(var(--ring) / 0.35);
     box-shadow: var(--shadow-raised);
   }
 
   .stat-icon {
     @apply flex size-9 shrink-0 items-center justify-center rounded-xl text-white;
     background-image: var(--gradient-icon-1);
-    box-shadow: 0 10px 22px -12px hsl(229 70% 8% / 0.9), inset 0 1px 0 hsl(0 0% 100% / 0.35);
+    box-shadow: 0 10px 22px -12px hsl(var(--primary) / 0.75), inset 0 1px 0 hsl(0 0% 100% / 0.35);
   }
 
   .stat-icon--2 {
@@ -470,7 +464,7 @@
   .icon-tile {
     @apply flex size-9 shrink-0 items-center justify-center rounded-xl text-white;
     background-image: var(--gradient-icon-1);
-    box-shadow: 0 10px 22px -12px hsl(229 70% 8% / 0.9), inset 0 1px 0 hsl(0 0% 100% / 0.35);
+    box-shadow: 0 10px 22px -12px hsl(var(--primary) / 0.75), inset 0 1px 0 hsl(0 0% 100% / 0.35);
   }
 
   .icon-tile--2 {
@@ -488,34 +482,53 @@
   .hero-banner {
     position: relative;
     overflow: hidden;
-    border-radius: var(--radius-card);
-    background-image: var(--hero-gradient);
+    border-radius: calc(var(--radius-card) + 0.25rem);
+    background-image:
+      radial-gradient(80% 80% at 8% 0%, rgba(56, 214, 245, 0.22), transparent 58%),
+      var(--hero-gradient);
     color: #fff;
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-raised);
+  }
+
+  .hero-banner h1,
+  .hero-banner h2,
+  .hero-banner h3,
+  .hero-panel h1,
+  .hero-panel h2,
+  .hero-panel h3 {
+    color: #fff;
   }
 
   .hero-action {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    border-radius: calc(var(--radius) + 2px);
-    border: 1px solid hsl(0 0% 100% / 0.24);
-    background-color: hsl(0 0% 100% / 0.12);
-    padding: 0.375rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid hsl(0 0% 100% / 0.28);
+    background-color: hsl(0 0% 100% / 0.1);
+    padding: 0.4rem 0.85rem;
     font-size: 0.75rem;
     font-weight: 600;
+    white-space: nowrap;
     color: #fff;
-    transition: background-color 150ms ease;
+    backdrop-filter: blur(10px);
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      transform 150ms ease;
   }
 
   .hero-action:hover {
+    transform: translateY(-1px);
     background-color: hsl(0 0% 100% / 0.2);
+    border-color: hsl(0 0% 100% / 0.45);
   }
 
   .hero-action--solid {
     background-image: var(--gradient-brand);
     border-color: transparent;
     color: hsl(var(--primary-foreground));
+    box-shadow: 0 16px 32px -16px hsl(var(--primary) / 0.75);
   }
 
   .hero-action--solid:hover {
@@ -626,11 +639,12 @@
   }
 
   .toolbar-surface {
-    @apply rounded-xl p-2.5;
-    background-color: hsl(var(--card) / 0.75);
+    @apply p-2.5;
+    border-radius: var(--radius-card);
+    background-color: hsl(var(--card) / 0.82);
     border: 1px solid var(--glass-border);
     box-shadow: var(--shadow-card);
-    backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(12px);
   }
 
   .data-table {
@@ -643,8 +657,9 @@
   }
 
   .data-table thead th {
-    @apply sticky top-0 z-10 bg-card/85 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground backdrop-blur;
-    border-bottom: 1px solid hsl(var(--border) / 0.6);
+    @apply sticky top-0 z-10 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground backdrop-blur;
+    background-color: hsl(var(--card) / 0.9);
+    border-bottom: 1px solid hsl(var(--border) / 0.7);
   }
 
   .data-table tbody td {
@@ -1274,19 +1289,19 @@
   }
 
   .auth-card {
-    background-color: hsl(var(--card) / 0.86);
+    background-color: hsl(var(--card) / 0.9);
     background-image: linear-gradient(180deg, var(--glass-sheen), transparent 42%);
     border: 1px solid var(--glass-border);
-    border-radius: calc(var(--radius-card) + 0.25rem);
+    border-radius: calc(var(--radius-card) + 0.35rem);
     box-shadow: var(--shadow-raised);
-    backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(16px);
   }
 
   .dialog-panel {
     background-color: hsl(var(--card));
     background-image: linear-gradient(180deg, var(--glass-sheen), transparent 42%);
     border: 1px solid var(--glass-border);
-    border-radius: calc(var(--radius-card) + 0.125rem);
+    border-radius: calc(var(--radius-card) + 0.25rem);
     box-shadow: var(--shadow-raised);
     backdrop-filter: blur(var(--glass-blur));
   }
@@ -1336,35 +1351,53 @@
 
   /* Bootstrap component polish layered on the template tokens. */
   .btn {
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    border-radius: calc(var(--radius) + 2px);
+    font-weight: 650;
+    letter-spacing: -0.005em;
+    border-radius: 0.75rem;
+  }
+
+  .btn-icon {
+    border-radius: 0.75rem;
   }
 
   .btn-solid {
-    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.14), 0 1px 2px hsl(var(--foreground) / 0.1);
+    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.14), 0 1px 2px hsl(var(--foreground) / 0.08);
   }
 
   .btn-solid.theme-primary {
     background-image: var(--gradient-brand);
     color: hsl(var(--primary-foreground));
-    box-shadow: 0 12px 26px -16px hsl(var(--primary) / 0.95), inset 0 1px 0 hsl(0 0% 100% / 0.3);
+    border-radius: 999px;
+    box-shadow:
+      0 14px 28px -16px hsl(var(--primary) / 0.8),
+      inset 0 1px 0 hsl(0 0% 100% / 0.28);
+    transition:
+      transform 180ms ease,
+      box-shadow 220ms ease,
+      filter 220ms ease;
   }
 
   .btn-solid.theme-primary:hover {
-    filter: brightness(1.05);
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+    box-shadow:
+      0 20px 36px -18px hsl(var(--primary) / 0.85),
+      inset 0 1px 0 hsl(0 0% 100% / 0.32);
   }
 
   .btn-outline {
-    border-color: hsl(var(--border) / 0.9);
+    border-color: hsl(var(--border) / 0.95);
+    background-color: hsl(var(--card) / 0.8);
+    border-radius: 999px;
   }
 
   .btn-outline:hover {
     background-color: hsl(var(--primary) / 0.08);
+    border-color: hsl(var(--ring) / 0.45);
   }
 
   .btn-text:hover {
-    background-color: hsl(var(--foreground) / 0.06);
+    background-color: hsl(var(--primary) / 0.08);
   }
 
   .btn-link {
@@ -1376,9 +1409,12 @@
   .form-control-lg {
     background-color: hsl(var(--card));
     border-color: hsl(var(--input));
-    border-radius: calc(var(--radius) - 2px);
+    border-radius: 0.7rem;
     color: hsl(var(--card-foreground));
-    box-shadow: inset 0 1px 2px hsl(0 0% 0% / 0.12);
+    box-shadow: inset 0 1px 2px hsl(var(--foreground) / 0.04);
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
   }
 
   .form-control::placeholder {
@@ -1388,7 +1424,7 @@
   .form-control:focus-visible,
   .form-control:focus-within {
     border-color: hsl(var(--ring) / 0.7);
-    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.18);
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.16);
   }
 
   .table {
