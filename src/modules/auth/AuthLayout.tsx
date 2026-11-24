@@ -1,6 +1,8 @@
 import type { ComponentType, ReactNode, SVGProps } from "react";
 import { Link } from "react-router-dom";
+import { buttonVariants } from "@/components/ui/button";
 import {
+  ArrowLeftIcon,
   CheckIcon,
   DropletIcon,
   EyeIcon,
@@ -9,6 +11,7 @@ import {
   TrendingUpIcon,
 } from "@/components/ui/icons";
 import { brand } from "@/config/brand";
+import { cn } from "@/lib/utils";
 import { AuthMobileShowcase, AuthShowcase } from "./AuthShowcase";
 
 interface HeroNote {
@@ -127,6 +130,14 @@ export function AuthLayout({
             </div>
           </div>
 
+          <Link
+            to="/welcome"
+            className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "-ml-2 w-fit gap-1.5")}
+          >
+            <ArrowLeftIcon className="size-4" />
+            Back to landing page
+          </Link>
+
           <div className="auth-card animate-rise p-5">
             <div className="mb-4">
               <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
@@ -154,7 +165,7 @@ export function AuthLayout({
           </div>
 
           <p className="text-center text-xs text-muted-foreground">
-            <Link to="/login" className="transition-colors hover:text-foreground">
+            <Link to="/welcome" className="transition-colors hover:text-foreground">
               {brand.stationName}
             </Link>
             <span className="mx-1.5 text-border">•</span>
