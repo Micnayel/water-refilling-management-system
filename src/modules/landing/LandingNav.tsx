@@ -55,8 +55,8 @@ export function LandingNav() {
           <Link className="lp-nav-signin" to="/login">
             Sign in
           </Link>
-          <Link className="lp-btn lp-btn--primary lp-nav-cta" to="/register">
-            Get started
+          <Link className="lp-btn lp-btn--primary lp-nav-cta" to="/login">
+            Sign up
           </Link>
           <button
             type="button"
@@ -97,6 +97,9 @@ export function LandingNav() {
             ))}
             <Link className="lp-nav-link" to="/login" onClick={() => setOpen(false)}>
               Sign in
+            </Link>
+            <Link className="lp-nav-link" to="/login" onClick={() => setOpen(false)}>
+              Sign up
             </Link>
           </nav>
         </div>

@@ -32,8 +32,8 @@ export function CtaSection() {
           Your daily water needs, simplified through technology.
         </p>
         <div className="lp-cta-actions">
-          <Link className="lp-btn lp-btn--light" to="/register">
-            Start your smart water experience
+          <Link className="lp-btn lp-btn--light" to="/login">
+            Sign up to get started
             <ArrowRightIcon className="size-4" />
           </Link>
           <a className="lp-btn lp-btn--outline-light" href="#features">

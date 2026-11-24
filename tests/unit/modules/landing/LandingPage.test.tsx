@@ -62,10 +62,10 @@ describe("LandingPage", () => {
 
   it("points primary actions at the auth routes", () => {
     renderPage();
-    const getStarted = screen.getAllByRole("link", { name: /get started/i });
-    expect(getStarted.length).toBeGreaterThan(0);
-    for (const link of getStarted) {
-      expect(link).toHaveAttribute("href", "/register");
+    const signUp = screen.getAllByRole("link", { name: /sign ?up/i });
+    expect(signUp.length).toBeGreaterThan(0);
+    for (const link of signUp) {
+      expect(link).toHaveAttribute("href", "/login");
     }
     expect(screen.getAllByRole("link", { name: /sign in/i })[0]).toHaveAttribute(
       "href",
