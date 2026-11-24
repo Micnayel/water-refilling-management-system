@@ -16,6 +16,14 @@ test("self-registration is reachable and explains approval", async ({ page }) =>
   ).toBeVisible();
 });
 
+test("the site root shows the landing page to anonymous visitors", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/welcome$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: /smart water delivery/i }),
+  ).toBeVisible();
+});
+
 test("protected routes redirect anonymous visitors to sign in", async ({ page }) => {
   await page.goto("/customers");
   await expect(page).toHaveURL(/\/login$/);

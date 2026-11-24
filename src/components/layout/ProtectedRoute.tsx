@@ -43,6 +43,9 @@ export function ProtectedRoute({
 
   if (status === "loading") return <FullPageLoader />;
   if (status === "anonymous" || !user) {
+    // The site root is the public entry point: send anonymous visitors to the
+    // marketing landing page. Deep links keep the sign-in redirect.
+    if (location.pathname === "/") return <Navigate to="/welcome" replace />;
     const from = `${location.pathname}${location.search}`;
     return <Navigate to="/login" replace state={{ from }} />;
   }

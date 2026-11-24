@@ -290,7 +290,7 @@ Permissions use the `module:view|add|edit|delete` grant format, matching AGENTS.
 
 The three workspace route trees render only when `VITE_PREVIEW_DATA=true`. They read the synthetic store in `src/modules/workspace/` and never call the API. In a production build the links are hidden and the routes redirect to `/`, so the existing API-backed modules remain the source of truth. Admin and delivery navigation also links to the live Customers, Inventory, Reports, Users, and Settings modules.
 
-The public routes are `/login`, `/register`, and the display-only marketing page at `/welcome`. The authenticated route tree includes a catch-all not-found page; denied access is rendered by `ProtectedRoute` within a protected route, not by a separate `/403` route. Every signed-in user may open `/settings` to choose their own template.
+The public routes are `/login`, `/register`, and the display-only marketing page at `/welcome`. Anonymous visitors to the site root `/` are sent to `/welcome`, while deep links such as `/customers` still redirect to `/login`. The authenticated route tree includes a catch-all not-found page; denied access is rendered by `ProtectedRoute` within a protected route, not by a separate `/403` route. Every signed-in user may open `/settings` to choose their own template.
 
 ### Adding or moving a route
 
