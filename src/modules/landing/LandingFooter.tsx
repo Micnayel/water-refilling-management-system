@@ -100,7 +100,7 @@ export function LandingFooter() {
               <h2>Account</h2>
               <ul>
                 <li>
-                  <Link to="/login">Sign up</Link>
+                  <Link to="/register">Sign up</Link>
                 </li>
                 <li>
                   <Link to="/login">Sign in</Link>

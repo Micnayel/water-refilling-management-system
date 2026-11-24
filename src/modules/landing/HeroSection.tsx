@@ -42,7 +42,7 @@ export function HeroSection() {
           </p>
 
           <div className="lp-hero-actions">
-            <Link className="lp-btn lp-btn--primary" to="/login">
+            <Link className="lp-btn lp-btn--primary" to="/register">
               Sign Up
               <ArrowRightIcon className="size-4" />
             </Link>
