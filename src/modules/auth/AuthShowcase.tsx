@@ -285,7 +285,7 @@ function StationScene() {
             letterSpacing="1.2"
             fill="hsl(var(--primary-foreground))"
           >
-            WRMS
+            RAINTECH
           </text>
           <path d="M414 108h28c6 0 10 4 12 9l3 9v26h-43z" fill="currentColor" fillOpacity="0.92" />
           <path d="M421 114h20c4 0 6 3 7 7l2 5h-29z" fill="hsl(var(--primary))" fillOpacity="0.35" />

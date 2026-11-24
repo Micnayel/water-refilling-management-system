@@ -43,8 +43,8 @@ function SubscribeScene() {
       <PhoneFrame className="lp-s2-phone">
         <div className="lp-ui">
           <div className="lp-ui-head">
-            <span className="lp-ui-logo">W</span>
-            <span>WRMS</span>
+            <span className="lp-ui-logo">R</span>
+            <span>RAINTECH</span>
           </div>
           <p className="lp-ui-eyebrow">Subscription</p>
           <p className="lp-ui-title">Weekly refill</p>
@@ -168,8 +168,8 @@ function FinalScene() {
       <BottleArt className="lp-s6-bottle" />
       <PhoneFrame className="lp-s6-phone">
         <div className="lp-s6-screen">
-          <span className="lp-s6-mark">W</span>
-          <p>WRMS</p>
+          <span className="lp-s6-mark">R</span>
+          <p>RAINTECH</p>
           <span>Delivered</span>
           <strong>2 jugs</strong>
         </div>

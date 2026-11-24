@@ -8,7 +8,7 @@ import { LandingNav } from "./LandingNav";
 import { ShowcaseSection } from "./ShowcaseSection";
 import "./landing.css";
 
-const TITLE = "Smart Water Refilling Station — Smart water delivery, made simple";
+const TITLE = "Raintech Water Refilling Station — Smart water delivery, made simple";
 const DESCRIPTION =
   "Subscribe to scheduled water refills, enjoy free delivery, and track every order from placement to doorstep.";
 

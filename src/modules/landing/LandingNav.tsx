@@ -33,13 +33,13 @@ export function LandingNav() {
   return (
     <header className={`lp-nav ${stuck ? "is-stuck" : ""}`}>
       <div className="lp-shell lp-nav-inner">
-        <a className="lp-brand" href="#top" aria-label="WRMS home">
+        <a className="lp-brand" href="#top" aria-label="Raintech Water Refilling Station home">
           <span className="lp-brand-mark">
             <DropletIcon className="size-4" />
           </span>
           <span>
-            <span className="lp-brand-name">Smart Water</span>
-            <span className="lp-brand-sub">Refilling Station</span>
+            <span className="lp-brand-name">Raintech</span>
+            <span className="lp-brand-sub">Water Refilling Station</span>
           </span>
         </a>
 

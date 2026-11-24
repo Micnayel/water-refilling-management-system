@@ -58,8 +58,8 @@ export function TruckArt({ className = "" }: { className?: string }) {
         d="M24 44c2 2.4 3 3.8 3 5.1a3 3 0 1 1-6 0c0-1.3 1-2.7 3-5.1z"
         fill="#fff"
       />
-      <text x="36" y="52" fontSize="11" fontWeight="700" letterSpacing="1" fill="#fff">
-        WRMS
+      <text x="36" y="52" fontSize="9" fontWeight="700" letterSpacing="0.6" fill="#fff">
+        RAINTECH
       </text>
     </svg>
   );
