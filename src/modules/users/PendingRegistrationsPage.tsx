@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Alert } from "@/components/ui/alert";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import { useApproveUser, usePendingUsers, useRejectUser, useRoles } from "./hook
 interface PendingTarget {
   id: string;
   name: string;
+  roleId: string | null;
 }
 
 export function PendingRegistrationsPage() {
@@ -42,9 +43,17 @@ export function PendingRegistrationsPage() {
 
   const openApprove = (target: PendingTarget) => {
     setApproveTarget(target);
-    setRoleId("");
-    setGrants([]);
   };
+
+  useEffect(() => {
+    if (!approveTarget) return;
+    const preset =
+      approveTarget.roleId ??
+      roles.data?.items.find((role) => role.name === "Customer")?.id ??
+      "";
+    setRoleId(preset);
+    setGrants(roles.data?.items.find((role) => role.id === preset)?.grants ?? []);
+  }, [approveTarget, roles.data]);
 
   const onRoleChange = (value: string) => {
     setRoleId(value);
@@ -81,7 +90,7 @@ export function PendingRegistrationsPage() {
     <div className="space-y-3">
       <PageHeader
         title="Pending registrations"
-        description="Self-registered accounts stay inactive with no grants until approved."
+        description="Self-registered accounts are pre-assigned the Customer role but stay inactive with no grants until approved."
         actions={
           <Link to="/administration/users" className={buttonVariants({ variant: "outline" })}>
             Back to users
@@ -123,13 +132,13 @@ export function PendingRegistrationsPage() {
                     {canApprove ? (
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button size="sm" onClick={() => openApprove({ id: user.id, name: user.fullName })}>
+                          <Button size="sm" onClick={() => openApprove({ id: user.id, name: user.fullName, roleId: user.roleId })}>
                             Approve
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => setRejectTarget({ id: user.id, name: user.fullName })}
+                            onClick={() => setRejectTarget({ id: user.id, name: user.fullName, roleId: user.roleId })}
                           >
                             Reject
                           </Button>
@@ -145,8 +154,8 @@ export function PendingRegistrationsPage() {
       </div>
 
       <Alert tone="info">
-        Approval activates the account. Pending accounts cannot sign in and receive no grants until
-        an administrator approves them.
+        Approval activates the account. Pending accounts cannot sign in, default to the Customer
+        role, and receive no grants until an administrator approves them.
       </Alert>
 
       <Dialog

@@ -27,7 +27,7 @@ Configuration is read from `backend/.env` (ignored) and process env. Never commi
 
 ## Authentication
 
-1. `POST /auth/register` validates the body, checks Turnstile, and creates a `pending` account with no grants. It always returns the same success message, so callers cannot discover whether an email or username already exists.
+1. `POST /auth/register` validates the body, checks Turnstile, and creates a `pending` account with the Customer role pre-assigned and no grants. It always returns the same success message, so callers cannot discover whether an email or username already exists.
 2. An Administrator approves the account, which makes it `active` and assigns grants or a role.
 3. `POST /auth/login` verifies the password with `scrypt`, rejects `pending` and `inactive` accounts, creates a random session token, and sets an HTTP-only session cookie. The CSRF token is returned in the response body and kept in browser memory only.
 4. Every non-GET authenticated request must send `x-csrf-token`; a mismatch returns `403 csrf_failed`.

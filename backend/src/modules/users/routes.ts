@@ -164,6 +164,9 @@ export async function registerUserRoutes(app: FastifyInstance, ctx: AppContext):
       const role = await findRole(ctx, input.roleId);
       if (!role) throw errors.invalid("Select a valid role.");
       if (!input.grants) grants = parseGrants(role.grants);
+    } else if (input.roleId === undefined && !input.grants && existing.roleId) {
+      const role = await findRole(ctx, existing.roleId);
+      if (role) grants = parseGrants(role.grants);
     }
 
     await ctx.db

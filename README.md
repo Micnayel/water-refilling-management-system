@@ -30,8 +30,8 @@ The router exposes workspaces rather than a forced screen sequence, but records 
 ### Login and Registration
 
 1. A visitor registers with the required details and passes the Turnstile check.
-2. The new account is created inactive with no grants and appears in the pending registrations list.
-3. An Administrator approves or rejects it and assigns a role; approval activates the account.
+2. The new account is created inactive with no grants, pre-assigned to the Customer role, and appears in the pending registrations list.
+3. An Administrator approves or rejects it and confirms or changes the role; approval activates the account and copies the role's grants.
 4. The user signs in at `/login`, receives an HTTP-only session cookie, and lands on the Dashboard.
 5. The session ends on logout, idle timeout, or server-side expiry.
 
@@ -79,7 +79,7 @@ The router exposes workspaces rather than a forced screen sequence, but records 
 ### User Management
 
 1. An Administrator reviews pending registrations and approves or rejects them.
-2. The Administrator assigns a role; selecting a role replaces the user's grants with the role defaults, which can then be adjusted.
+2. Pending registrations arrive with the Customer role pre-assigned; the Administrator confirms or changes the role. Selecting a role replaces the user's grants with the role defaults, which can then be adjusted.
 3. Users can be deactivated and reactivated; the last active Administrator cannot be deactivated.
 
 ### Settings
@@ -354,7 +354,7 @@ Page
 #### Login and Registration
 
 - Route and API: `/login`, `/register`, and `backend/src/modules/auth/routes.ts`.
-- Rules: Public routes with no grant. Turnstile and rate limiting on sign-in and registration. Self-registered accounts are inactive with no grants until an Administrator approves them. Responses never reveal whether an email or username exists. Passwords are hashed server-side and never logged.
+- Rules: Public routes with no grant. Turnstile and rate limiting on sign-in and registration. Self-registered accounts are inactive, pre-assigned the Customer role, and have no grants until an Administrator approves them. Responses never reveal whether an email or username exists. Passwords are hashed server-side and never logged.
 - Audit events: `AUTH_REGISTER`, `AUTH_APPROVE`, `AUTH_LOGIN`, `AUTH_LOGIN_FAILED`, `AUTH_LOGOUT`.
 
 #### Dashboard

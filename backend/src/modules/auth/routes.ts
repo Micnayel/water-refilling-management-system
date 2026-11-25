@@ -3,13 +3,14 @@ import { eq, or } from "drizzle-orm";
 import type { AppContext } from "../../context";
 import { toAuthUser } from "../../context";
 import { env } from "../../config/env";
-import { users } from "../../db/schema";
+import { roles, users } from "../../db/schema";
 import { hashPassword, newId, randomToken, verifyPassword } from "../../lib/crypto";
 import { ApiError, errors, parseBody } from "../../lib/errors";
 import { clientKey, rateLimit, verifyTurnstile } from "./service";
 import { loginSchema, registerSchema } from "./schemas";
 
 const DUMMY_HASH = hashPassword("not-a-real-password-value");
+const DEFAULT_PENDING_ROLE = "Customer";
 
 function sessionCookieOptions() {
   return {
@@ -58,12 +59,18 @@ export async function registerAuthRoutes(app: FastifyInstance, ctx: AppContext):
 
     if (existing.length === 0) {
       const id = newId();
+      const defaultRole = await ctx.db
+        .select({ id: roles.id })
+        .from(roles)
+        .where(eq(roles.name, DEFAULT_PENDING_ROLE))
+        .limit(1);
       await ctx.db.insert(users).values({
         id,
         email: input.email.toLowerCase(),
         username: input.username,
         fullName: input.fullName,
         passwordHash: hashPassword(input.password),
+        roleId: defaultRole[0]?.id ?? null,
         status: "pending",
         grants: "[]",
       });
