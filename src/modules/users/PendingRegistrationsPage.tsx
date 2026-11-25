@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Alert } from "@/components/ui/alert";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { NativeSelect } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { SkeletonRows } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
@@ -20,13 +19,11 @@ import { useToast } from "@/components/ui/toaster";
 import { apiMessage } from "@/lib/api-client";
 import { formatDateNumeric } from "@/lib/dates";
 import { usePermission } from "@/hooks/use-permission";
-import { GrantPicker } from "./GrantPicker";
 import { useApproveUser, usePendingUsers, useRejectUser, useRoles } from "./hooks";
 
 interface PendingTarget {
   id: string;
   name: string;
-  roleId: string | null;
 }
 
 export function PendingRegistrationsPage() {
@@ -36,40 +33,15 @@ export function PendingRegistrationsPage() {
   const reject = useRejectUser();
   const toast = useToast();
   const canApprove = usePermission("admin:edit");
-  const [approveTarget, setApproveTarget] = useState<PendingTarget | null>(null);
   const [rejectTarget, setRejectTarget] = useState<PendingTarget | null>(null);
-  const [roleId, setRoleId] = useState("");
-  const [grants, setGrants] = useState<string[]>([]);
 
-  const openApprove = (target: PendingTarget) => {
-    setApproveTarget(target);
-  };
+  const roleName = (roleId: string | null) =>
+    roles.data?.items.find((role) => role.id === roleId)?.name ?? "Customer";
 
-  useEffect(() => {
-    if (!approveTarget) return;
-    const preset =
-      approveTarget.roleId ??
-      roles.data?.items.find((role) => role.name === "Customer")?.id ??
-      "";
-    setRoleId(preset);
-    setGrants(roles.data?.items.find((role) => role.id === preset)?.grants ?? []);
-  }, [approveTarget, roles.data]);
-
-  const onRoleChange = (value: string) => {
-    setRoleId(value);
-    const role = roles.data?.items.find((entry) => entry.id === value);
-    if (role) setGrants(role.grants);
-  };
-
-  const confirmApprove = async () => {
-    if (!approveTarget) return;
+  const confirmApprove = async (target: PendingTarget) => {
     try {
-      await approve.mutateAsync({
-        id: approveTarget.id,
-        values: { roleId: roleId || null, grants },
-      });
-      toast("Registration approved.", "success");
-      setApproveTarget(null);
+      await approve.mutateAsync({ id: target.id, values: {} });
+      toast(`${target.name} approved with the Customer role.`, "success");
     } catch (error) {
       toast(apiMessage(error), "error");
     }
@@ -118,6 +90,7 @@ export function PendingRegistrationsPage() {
                   <TableHeaderCell>Name</TableHeaderCell>
                   <TableHeaderCell>Username</TableHeaderCell>
                   <TableHeaderCell>Email</TableHeaderCell>
+                  <TableHeaderCell>Role</TableHeaderCell>
                   <TableHeaderCell>Registered</TableHeaderCell>
                   {canApprove ? <TableHeaderCell className="text-right">Actions</TableHeaderCell> : null}
                 </TableRow>
@@ -128,17 +101,22 @@ export function PendingRegistrationsPage() {
                     <TableCell className="font-medium">{user.fullName}</TableCell>
                     <TableCell className="text-muted-foreground">{user.username}</TableCell>
                     <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                    <TableCell>{roleName(user.roleId)}</TableCell>
                     <TableCell>{formatDateNumeric(user.createdAt)}</TableCell>
                     {canApprove ? (
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button size="sm" onClick={() => openApprove({ id: user.id, name: user.fullName, roleId: user.roleId })}>
+                          <Button
+                            size="sm"
+                            loading={approve.isPending && approve.variables?.id === user.id}
+                            onClick={() => void confirmApprove({ id: user.id, name: user.fullName })}
+                          >
                             Approve
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => setRejectTarget({ id: user.id, name: user.fullName, roleId: user.roleId })}
+                            onClick={() => setRejectTarget({ id: user.id, name: user.fullName })}
                           >
                             Reject
                           </Button>
@@ -154,49 +132,9 @@ export function PendingRegistrationsPage() {
       </div>
 
       <Alert tone="info">
-        Approval activates the account. Pending accounts cannot sign in, default to the Customer
-        role, and receive no grants until an administrator approves them.
+        Approving activates the account immediately with the Customer role and its grants. Change
+        the role afterward in User management if needed.
       </Alert>
-
-      <Dialog
-        open={Boolean(approveTarget)}
-        onOpenChange={(open) => {
-          if (!open) setApproveTarget(null);
-        }}
-        title={`Approve ${approveTarget?.name ?? "registration"}`}
-        description="Assign a role and grants. Approval is audited."
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setApproveTarget(null)}>
-              Cancel
-            </Button>
-            <Button loading={approve.isPending} onClick={() => void confirmApprove()}>
-              Approve account
-            </Button>
-          </>
-        }
-      >
-        <div className="space-y-3">
-          <div>
-            <label htmlFor="approve-role" className="text-xs font-medium text-muted-foreground">
-              Role
-            </label>
-            <NativeSelect
-              id="approve-role"
-              value={roleId}
-              onChange={(event) => onRoleChange(event.target.value)}
-            >
-              <option value="">No role</option>
-              {roles.data?.items.map((role) => (
-                <option key={role.id} value={role.id}>
-                  {role.name}
-                </option>
-              ))}
-            </NativeSelect>
-          </div>
-          <GrantPicker value={grants} onChange={setGrants} idPrefix="approve" />
-        </div>
-      </Dialog>
 
       <Dialog
         open={Boolean(rejectTarget)}

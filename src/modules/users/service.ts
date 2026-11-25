@@ -38,7 +38,7 @@ export function updateUser(
   return apiRequest(`/users/${id}`, { method: "PATCH", body: values, schema: publicUserSchema });
 }
 
-export function approveUser(id: string, values: { roleId: string | null; grants: string[] }) {
+export function approveUser(id: string, values: { roleId?: string | null; grants?: string[] }) {
   return apiRequest(`/users/${id}/approve`, { method: "POST", body: values, schema: publicUserSchema });
 }
 

@@ -44,8 +44,25 @@ const managerRole = {
 
 const approveMock = {
   isPending: false,
+  variables: undefined as { id: string } | undefined,
   mutateAsync: vi.fn().mockResolvedValue({}),
 };
+
+function pendingUser(overrides: Record<string, unknown> = {}) {
+  return {
+    id: "user-1",
+    fullName: "Demo Applicant",
+    username: "demo",
+    email: "demo@example.test",
+    roleId: "role-customer",
+    status: "pending",
+    grants: [],
+    template: "default",
+    version: 1,
+    createdAt: null,
+    ...overrides,
+  };
+}
 
 function renderPage() {
   render(
@@ -74,65 +91,42 @@ describe("PendingRegistrationsPage", () => {
     } as unknown as ReturnType<typeof useRoles>);
   });
 
-  it("defaults approval to the pre-assigned Customer role", async () => {
+  it("approves in one click with the pre-assigned Customer role", async () => {
     mockedPending.mockReturnValue({
       isLoading: false,
       isError: false,
-      data: {
-        items: [
-          {
-            id: "user-1",
-            fullName: "Demo Applicant",
-            username: "demo",
-            email: "demo@example.test",
-            roleId: "role-customer",
-            status: "pending",
-            grants: [],
-            template: "default",
-            version: 1,
-            createdAt: null,
-          },
-        ],
-      },
+      data: { items: [pendingUser()] },
     } as unknown as ReturnType<typeof usePendingUsers>);
 
     renderPage();
+    expect(screen.getByText("Customer")).toBeInTheDocument();
+
     await userEvent.click(screen.getByRole("button", { name: "Approve" }));
 
-    expect(screen.getByLabelText("Role")).toHaveValue("role-customer");
-
-    await userEvent.click(screen.getByRole("button", { name: "Approve account" }));
-    expect(approveMock.mutateAsync).toHaveBeenCalledWith({
-      id: "user-1",
-      values: { roleId: "role-customer", grants: customerRole.grants },
-    });
+    expect(approveMock.mutateAsync).toHaveBeenCalledWith({ id: "user-1", values: {} });
+    expect(screen.queryByLabelText("Role")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Add customers")).not.toBeInTheDocument();
   });
 
-  it("falls back to the Customer role when a pending account has none", async () => {
+  it("shows Customer for a legacy pending account with no role", () => {
     mockedPending.mockReturnValue({
       isLoading: false,
       isError: false,
-      data: {
-        items: [
-          {
-            id: "user-2",
-            fullName: "Legacy Applicant",
-            username: "legacy",
-            email: "legacy@example.test",
-            roleId: null,
-            status: "pending",
-            grants: [],
-            template: "default",
-            version: 1,
-            createdAt: null,
-          },
-        ],
-      },
+      data: { items: [pendingUser({ id: "user-2", roleId: null })] },
     } as unknown as ReturnType<typeof usePendingUsers>);
 
     renderPage();
-    await userEvent.click(screen.getByRole("button", { name: "Approve" }));
+    expect(screen.getByText("Customer")).toBeInTheDocument();
+  });
 
-    expect(screen.getByLabelText("Role")).toHaveValue("role-customer");
+  it("shows an empty state", () => {
+    mockedPending.mockReturnValue({
+      isLoading: false,
+      isError: false,
+      data: { items: [] },
+    } as unknown as ReturnType<typeof usePendingUsers>);
+
+    renderPage();
+    expect(screen.getByText("No pending registrations")).toBeInTheDocument();
   });
 });

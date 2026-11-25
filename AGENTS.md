@@ -74,7 +74,7 @@ There is no generic `components/shared` folder. Extend the matching `ui`, `layou
 
 ### Module rules
 
-- **Login and Registration**: Sign-in uses an HTTP-only session cookie, CSRF protection, Turnstile, and rate limiting. Self-registration creates an account that is inactive, pre-assigned the Customer role, and has no grants until an Administrator approves it. Never reveal whether an email or username exists. Passwords are hashed server-side and never logged.
+- **Login and Registration**: Sign-in uses an HTTP-only session cookie, CSRF protection, Turnstile, and rate limiting. Self-registration creates an account that is inactive, pre-assigned the Customer role, and has no grants until an Administrator approves it; approval activates the account and applies the Customer role's grants. Never reveal whether an email or username exists. Passwords are hashed server-side and never logged.
 - **Dashboard**: Read-only. Shows a customer location map, sales, client count, client location statistics, and inventory count. All figures come from `/api/v1`, never computed from raw records in the browser. Map pins are masked or generalized by default; exact positions and names need a permissioned, audited reveal.
 - **Heat Map**: Read-only. The API returns aggregated, bucketed points (for example by grid cell or barangay with a count), never individual customer coordinates or names. Filters (date range, area, metric) go in request bodies when they could identify a person.
 - **Inventory**: Tracks gallons by state (for example full, empty, with customer, damaged). Quantities change only through immutable stock movements (in, out, return, adjust), each with a reason. Stock can never go negative; stale versions return `409`.

@@ -27,6 +27,11 @@ async function findRole(ctx: AppContext, roleId: string) {
   return rows[0] ?? null;
 }
 
+async function findRoleByName(ctx: AppContext, name: string) {
+  const rows = await ctx.db.select().from(roles).where(eq(roles.name, name)).limit(1);
+  return rows[0] ?? null;
+}
+
 export async function registerUserRoutes(app: FastifyInstance, ctx: AppContext): Promise<void> {
   const adminView = { preHandler: [ctx.authenticate] };
 
@@ -160,20 +165,24 @@ export async function registerUserRoutes(app: FastifyInstance, ctx: AppContext):
     if (existing.status === "active") throw errors.conflict("That account is already active.");
 
     let grants = input.grants ?? [];
+    let roleId = input.roleId !== undefined ? input.roleId : existing.roleId;
     if (input.roleId) {
       const role = await findRole(ctx, input.roleId);
       if (!role) throw errors.invalid("Select a valid role.");
       if (!input.grants) grants = parseGrants(role.grants);
-    } else if (input.roleId === undefined && !input.grants && existing.roleId) {
-      const role = await findRole(ctx, existing.roleId);
-      if (role) grants = parseGrants(role.grants);
+    } else if (input.roleId === undefined && !input.grants) {
+      const role = roleId ? await findRole(ctx, roleId) : await findRoleByName(ctx, "Customer");
+      if (role) {
+        roleId = role.id;
+        grants = parseGrants(role.grants);
+      }
     }
 
     await ctx.db
       .update(users)
       .set({
         status: "active",
-        roleId: input.roleId !== undefined ? input.roleId : existing.roleId,
+        roleId,
         grants: JSON.stringify(grants),
         version: existing.version + 1,
       })

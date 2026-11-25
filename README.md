@@ -79,7 +79,7 @@ The router exposes workspaces rather than a forced screen sequence, but records 
 ### User Management
 
 1. An Administrator reviews pending registrations and approves or rejects them.
-2. Pending registrations arrive with the Customer role pre-assigned; the Administrator confirms or changes the role. Selecting a role replaces the user's grants with the role defaults, which can then be adjusted.
+2. Approving a registration applies the pre-assigned Customer role and its grants automatically; an administrator can change the role afterward in User management.
 3. Users can be deactivated and reactivated; the last active Administrator cannot be deactivated.
 
 ### Settings
@@ -354,7 +354,7 @@ Page
 #### Login and Registration
 
 - Route and API: `/login`, `/register`, and `backend/src/modules/auth/routes.ts`.
-- Rules: Public routes with no grant. Turnstile and rate limiting on sign-in and registration. Self-registered accounts are inactive, pre-assigned the Customer role, and have no grants until an Administrator approves them. Responses never reveal whether an email or username exists. Passwords are hashed server-side and never logged.
+- Rules: Public routes with no grant. Turnstile and rate limiting on sign-in and registration. Self-registered accounts are inactive, pre-assigned the Customer role, and have no grants until an Administrator approves them; approval applies the Customer role's grants. Responses never reveal whether an email or username exists. Passwords are hashed server-side and never logged.
 - Audit events: `AUTH_REGISTER`, `AUTH_APPROVE`, `AUTH_LOGIN`, `AUTH_LOGIN_FAILED`, `AUTH_LOGOUT`.
 
 #### Dashboard

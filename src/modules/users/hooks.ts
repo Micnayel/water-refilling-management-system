@@ -72,7 +72,7 @@ export function useUpdateUser(id: string) {
 export function useApproveUser() {
   const invalidate = useInvalidateUsers();
   return useMutation({
-    mutationFn: (input: { id: string; values: { roleId: string | null; grants: string[] } }) =>
+    mutationFn: (input: { id: string; values: { roleId?: string | null; grants?: string[] } }) =>
       service.approveUser(input.id, input.values),
     onSuccess: invalidate,
   });
