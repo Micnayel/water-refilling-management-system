@@ -23,6 +23,7 @@ import { usePermission } from "@/hooks/use-permission";
 import { hasGrant, useSessionStore } from "@/stores/session-store";
 import { useUiStore } from "@/stores/ui-store";
 import { useLogoutMutation } from "@/modules/auth";
+import { WorkspaceLayout } from "@/modules/workspace";
 import { SessionTimeout } from "@/components/session/SessionTimeout";
 
 function NavEntry({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) {
@@ -162,6 +163,14 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
 }
 
 export function AppShell() {
+  const user = useSessionStore((state) => state.user);
+  if (user && hasGrant(user, "admin:view")) {
+    return <WorkspaceLayout role="admin" />;
+  }
+  return <StandardAppShell />;
+}
+
+function StandardAppShell() {
   const user = useSessionStore((state) => state.user);
   const { sidebarCollapsed, toggleSidebar, mobileNavOpen, setMobileNav } = useUiStore();
   const [menuOpen, setMenuOpen] = useState(false);

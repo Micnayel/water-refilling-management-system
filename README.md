@@ -285,10 +285,10 @@ Permissions use the `module:view|add|edit|delete` grant format, matching AGENTS.
 | Notifications | `/notifications` | `notifications:view` |
 | Settings | `/settings` | `settings:view` |
 | Customer portal | `/portal`, `/portal/subscription`, `/portal/order`, `/portal/history`, `/portal/tracking`, `/portal/profile`, `/portal/notifications` | `dashboard:view` |
-| Admin workspace | `/overview`, `/overview/orders`, `/overview/subscriptions`, `/overview/deliveries`, `/overview/tracking` | `admin:view` |
+| Admin workspace | `/overview`, `/overview/orders`, `/overview/subscriptions`, `/overview/deliveries`, `/overview/tracking` | `admin:view` (sample records) |
 | Delivery workspace | `/dispatch`, `/dispatch/history`, `/dispatch/customers`, `/dispatch/notifications`, `/dispatch/profile` | `scheduling:view` |
 
-The three workspace route trees are available to signed-in staff and read the sample store in `src/modules/workspace/`. They never call the API, and their actions stay in the browser session. The existing API-backed modules remain the source of truth for real records. Admin and delivery navigation also links to the live Customers, Inventory, Reports, Users, and Settings modules.
+The three workspace route trees are available to signed-in staff and read the sample store in `src/modules/workspace/`. They never call the API, and their actions stay in the browser session. The existing API-backed modules remain the source of truth for real records. The customer and delivery workspaces remain sample-backed; the administrator workspace is also the live admin shell, so every API-backed admin route (Overview, Heat Map, Customers, Scheduling, Inventory, Reports, Audit, Notifications, User Management, Roles, and Settings) renders inside the same `WorkspaceLayout` design. Its "Sample records" group links to the sample overview and sample order, subscription, delivery, and tracking pages, which stay labelled as sample data.
 
 The public routes are `/login`, `/register`, and the display-only marketing page at `/welcome`. Anonymous visitors to the site root `/` are sent to `/welcome`, while deep links such as `/customers` still redirect to `/login`. The authenticated route tree includes a catch-all not-found page; denied access is rendered by `ProtectedRoute` within a protected route, not by a separate `/403` route. Every signed-in user may open `/settings` to choose their own template.
 
@@ -401,12 +401,13 @@ Page
 
 #### Role workspaces
 
-- Routes: `/portal` (customer), `/overview` (administrator), and `/dispatch` (delivery personnel). Each route tree requires a signed-in session and the grant listed in the routes table.
+- Routes: `/portal` (customer), `/overview` (administrator sample pages), and `/dispatch` (delivery personnel). Each route tree requires a signed-in session and the grant listed in the routes table.
+- Admin shell: signed-in users with `admin:view` render every API-backed admin route inside `WorkspaceLayout role="admin"`. The sidebar exposes Overview, Heat Map, Customer Management, Scheduling, Inventory Management, Reports and Analytics, Audit trail, Notifications, User Management, Pending registrations, Roles, and System Settings, filtered by the user's grants. The live shell keeps the user's chosen template and hides the sample badge.
 - Data: `src/modules/workspace/data.ts` holds sample customers, plans, subscriptions, orders, deliveries, transactions, notifications, inventory, registrations, and revenue points. `store.ts` holds them in a Zustand store so sample actions (place or cancel an order, confirm an order, pause or skip a subscription, change a plan, advance a delivery, approve a registration, reveal contact, edit a profile) are real within the session.
-- Design: one shared `WorkspaceLayout`, status pill, stat card, table, timeline, chart, notification, dialog, and tracking component set, styled by `workspace.css` on the existing tokens. The workspace applies the light Aqua template while mounted and restores the previous template on exit.
+- Design: one shared `WorkspaceLayout`, status pill, stat card, table, timeline, chart, notification, dialog, and tracking component set, styled by `workspace.css` on the existing tokens. Sample workspaces apply the light Aqua template while mounted and restore the previous template on exit; the live admin shell leaves the selected template untouched.
 - Tracking: the map is a deliberately stylised SVG route, labelled "Simulated route preview — not live GPS". It never requests Google Maps, never displays coordinates, and offers a text alternative for keyboard and screen-reader users.
 - Privacy: contact numbers are masked until revealed; reveals and profile edits are local sample actions and are not written to the API or the audit trail.
-- Production data: the workspaces are sample-backed. Connecting them to real customer accounts, subscriptions, orders, and rider assignments needs new backend tables, grants, and audit events, which remain open work.
+- Production data: the customer and delivery workspaces, plus the sample records group in the admin sidebar, are sample-backed. Connecting them to real customer accounts, subscriptions, orders, and rider assignments needs new backend tables, grants, and audit events, which remain open work.
 
 ## Security and sensitive-data rules
 

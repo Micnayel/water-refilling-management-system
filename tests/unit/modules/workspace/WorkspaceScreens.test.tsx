@@ -1,9 +1,12 @@
 import type { ReactElement } from "react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useWorkspaceStore } from "@/modules/workspace/store";
+import { WorkspaceLayout } from "@/modules/workspace/components/WorkspaceLayout";
+import { useSessionStore } from "@/stores/session-store";
 import { CustomerDashboard } from "@/modules/workspace/pages/customer/CustomerDashboard";
 import { CustomerOrder } from "@/modules/workspace/pages/customer/CustomerOrder";
 import { RiderDeliveries } from "@/modules/workspace/pages/rider/RiderDeliveries";
@@ -12,6 +15,28 @@ import { WorkspaceNotificationsPage } from "@/modules/workspace/components/Notif
 
 const initialState = useWorkspaceStore.getState();
 
+const adminUser = {
+  id: "user-admin",
+  username: "admin",
+  email: "admin@example.test",
+  fullName: "Station Administrator",
+  roleId: "role-admin",
+  status: "active",
+  grants: [
+    "admin:view",
+    "dashboard:view",
+    "heatmap:view",
+    "customers:view",
+    "scheduling:view",
+    "inventory:view",
+    "reports:view",
+    "audit:view",
+    "notifications:view",
+    "settings:view",
+  ],
+  template: "default",
+};
+
 function renderInRouter(element: ReactElement) {
   return render(<MemoryRouter>{element}</MemoryRouter>);
 }
@@ -19,6 +44,33 @@ function renderInRouter(element: ReactElement) {
 describe("workspace screens", () => {
   beforeEach(() => {
     useWorkspaceStore.setState(initialState, true);
+  });
+
+  afterEach(() => {
+    useSessionStore.getState().clear();
+  });
+
+  it("renders the live admin shell with real module navigation", () => {
+    useSessionStore.getState().setUser(adminUser);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/"]}>
+          <Routes>
+            <Route path="/" element={<WorkspaceLayout role="admin" />}>
+              <Route index element={<div>live dashboard</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByText("live dashboard")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Heat Map" })).toHaveAttribute("href", "/heat-map");
+    expect(screen.getByRole("link", { name: "Scheduling" })).toHaveAttribute("href", "/scheduling");
+    expect(screen.getByRole("link", { name: "Overview" })).toHaveAttribute("href", "/");
+    expect(screen.getByText("Live operations")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Standard console" })).not.toBeInTheDocument();
   });
 
   it("opens order details from the customer dashboard", async () => {

@@ -21,8 +21,10 @@ import {
 } from "@/components/ui/icons";
 import { brand } from "@/config/brand";
 import { useLogoutMutation } from "@/modules/auth";
-import { useSessionStore } from "@/stores/session-store";
+import { hasGrant, useSessionStore } from "@/stores/session-store";
 import { initials } from "@/lib/utils";
+import { SessionTimeout } from "@/components/session/SessionTimeout";
+import { Toaster } from "@/components/ui/toaster";
 import { useWorkspaceStore } from "../store";
 import { DEMO_CUSTOMER_ID } from "../data";
 import { unreadCount } from "../selectors";
@@ -36,6 +38,7 @@ interface WorkspaceNavItem {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
   end?: boolean;
   badge?: number;
+  grant?: string;
 }
 
 interface WorkspaceNavGroup {
@@ -49,8 +52,60 @@ const roleMeta: Record<WorkspaceRole, { name: string; home: string; blurb: strin
   rider: { name: "Delivery personnel", home: "/dispatch", blurb: "Today's route and stops" },
 };
 
-function useNavGroups(role: WorkspaceRole): WorkspaceNavGroup[] {
-  const unread = useWorkspaceStore((state) => unreadCount(state, role));
+const liveAdminGroups: WorkspaceNavGroup[] = [
+  {
+    label: "Overview",
+    items: [
+      { label: "Overview", to: "/", icon: DashboardIcon, end: true, grant: "dashboard:view" },
+      { label: "Heat Map", to: "/heat-map", icon: MapIcon, grant: "heatmap:view" },
+    ],
+  },
+  {
+    label: "Operations",
+    items: [
+      { label: "Customer Management", to: "/customers", icon: UsersIcon, grant: "customers:view" },
+      { label: "Scheduling", to: "/scheduling", icon: CalendarIcon, grant: "scheduling:view" },
+      { label: "Inventory Management", to: "/inventory", icon: PackageIcon, grant: "inventory:view" },
+    ],
+  },
+  {
+    label: "Insights",
+    items: [
+      { label: "Reports and Analytics", to: "/reports", icon: FileTextIcon, grant: "reports:view" },
+      { label: "Audit trail", to: "/audit", icon: ClipboardIcon, grant: "audit:view" },
+      { label: "Notifications", to: "/notifications", icon: BellIcon, grant: "notifications:view" },
+    ],
+  },
+  {
+    label: "Administration",
+    items: [
+      { label: "User Management", to: "/administration/users", icon: ShieldIcon, grant: "admin:view" },
+      {
+        label: "Pending registrations",
+        to: "/administration/users/pending",
+        icon: UsersIcon,
+        grant: "admin:view",
+      },
+      { label: "Roles", to: "/administration/roles", icon: ShieldIcon, grant: "admin:view" },
+      { label: "System Settings", to: "/settings", icon: SettingsIcon, grant: "settings:view" },
+    ],
+  },
+  {
+    label: "Sample records",
+    items: [
+      { label: "Sample overview", to: "/overview", icon: DashboardIcon, end: true },
+      { label: "Orders", to: "/overview/orders", icon: ClipboardIcon },
+      { label: "Subscriptions", to: "/overview/subscriptions", icon: CalendarIcon },
+      { label: "Deliveries", to: "/overview/deliveries", icon: TruckIcon },
+      { label: "Delivery tracking", to: "/overview/tracking", icon: MapIcon },
+    ],
+  },
+];
+
+function useNavGroups(role: WorkspaceRole, sample: boolean): WorkspaceNavGroup[] {
+  const unread = useWorkspaceStore((state) =>
+    role === "admin" && !sample ? 0 : unreadCount(state, role),
+  );
 
   if (role === "customer") {
     return [
@@ -97,11 +152,15 @@ function useNavGroups(role: WorkspaceRole): WorkspaceNavGroup[] {
     ];
   }
 
+  if (!sample) return liveAdminGroups;
+
   return [
     {
       label: "Overview",
       items: [
         { label: "Overview", to: "/overview", icon: DashboardIcon, end: true },
+        { label: "Heat Map", to: "/heat-map", icon: MapIcon },
+        { label: "Scheduling", to: "/scheduling", icon: CalendarIcon },
         { label: "Delivery Tracking", to: "/overview/tracking", icon: MapIcon },
       ],
     },
@@ -119,7 +178,11 @@ function useNavGroups(role: WorkspaceRole): WorkspaceNavGroup[] {
       label: "Administration",
       items: [
         { label: "Reports and Analytics", to: "/reports", icon: FileTextIcon },
+        { label: "Audit trail", to: "/audit", icon: ClipboardIcon },
+        { label: "Notifications", to: "/notifications", icon: BellIcon },
         { label: "User Management", to: "/administration/users", icon: ShieldIcon },
+        { label: "Pending registrations", to: "/administration/users/pending", icon: UsersIcon },
+        { label: "Roles", to: "/administration/roles", icon: ShieldIcon },
         { label: "System Settings", to: "/settings", icon: SettingsIcon },
       ],
     },
@@ -137,13 +200,22 @@ function NavBadge({ count }: { count: number }) {
 
 function SidebarContent({
   role,
+  sample,
   onNavigate,
 }: {
   role: WorkspaceRole;
+  sample: boolean;
   onNavigate?: () => void;
 }) {
-  const groups = useNavGroups(role);
+  const groups = useNavGroups(role, sample);
   const user = useSessionStore((state) => state.user);
+  const visibleGroups = groups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => !item.grant || hasGrant(user, item.grant)),
+    }))
+    .filter((group) => group.items.length > 0);
+  const home = role === "admin" && !sample ? "/" : roleMeta[role].home;
   const personaName = useWorkspaceStore((state) =>
     role === "customer"
       ? (state.customers.find((row) => row.id === DEMO_CUSTOMER_ID)?.name ?? "Maria Santos")
@@ -151,7 +223,7 @@ function SidebarContent({
         ? state.rider.name
         : null,
   );
-  const displayName = personaName ?? user?.fullName ?? "Preview user";
+  const displayName = personaName ?? user?.fullName ?? "User";
   const navigate = useNavigate();
   const logout = useLogoutMutation();
 
@@ -165,7 +237,7 @@ function SidebarContent({
 
   return (
     <div className="flex h-full flex-col">
-      <Link to={roleMeta[role].home} className="ws-brand" onClick={onNavigate}>
+      <Link to={home} className="ws-brand" onClick={onNavigate}>
         <span className="ws-brand-mark">
           <DropletIcon className="size-5" />
         </span>
@@ -178,7 +250,7 @@ function SidebarContent({
       </Link>
 
       <nav aria-label="Workspace navigation" className="ws-nav">
-        {groups.map((group) => (
+        {visibleGroups.map((group) => (
           <div key={group.label} className="ws-nav-group">
             <p className="ws-nav-label">{group.label}</p>
             <div className="space-y-0.5">
@@ -222,9 +294,13 @@ function SidebarContent({
           </button>
         </div>
         <div className="mt-2 flex items-center justify-between gap-2 px-1">
-          <Link to="/" className="text-[0.625rem] text-white/55 transition-colors hover:text-white">
-            Standard console
-          </Link>
+          {sample ? (
+            <Link to="/" className="text-[0.625rem] text-white/55 transition-colors hover:text-white">
+              Standard console
+            </Link>
+          ) : (
+            <span className="text-[0.625rem] text-white/55">Live operations</span>
+          )}
           <Link to="/welcome" className="text-[0.625rem] text-white/55 transition-colors hover:text-white">
             About
           </Link>
@@ -234,26 +310,34 @@ function SidebarContent({
   );
 }
 
-const roleLinks: Array<{ role: WorkspaceRole; label: string; to: string }> = [
-  { role: "customer", label: "Customer", to: "/portal" },
-  { role: "admin", label: "Admin", to: "/overview" },
-  { role: "rider", label: "Delivery", to: "/dispatch" },
-];
-
-export function WorkspaceLayout({ role }: { role: WorkspaceRole }) {
+export function WorkspaceLayout({
+  role,
+  sample = role !== "admin",
+}: {
+  role: WorkspaceRole;
+  sample?: boolean;
+}) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const user = useSessionStore((state) => state.user);
-  const unread = useWorkspaceStore((state) => unreadCount(state, role));
-  const groups = useNavGroups(role);
+  const unread = useWorkspaceStore((state) =>
+    role === "admin" && !sample ? 0 : unreadCount(state, role),
+  );
+  const groups = useNavGroups(role, sample);
   const notificationsPath =
     role === "customer" ? "/portal/notifications" : role === "rider" ? "/dispatch/notifications" : "/notifications";
   const profilePath = role === "customer" ? "/portal/profile" : role === "rider" ? "/dispatch/profile" : "/settings";
+  const roleLinks: Array<{ role: WorkspaceRole; label: string; to: string }> = [
+    { role: "customer", label: "Customer", to: "/portal" },
+    { role: "admin", label: "Admin", to: role === "admin" && !sample ? "/" : "/overview" },
+    { role: "rider", label: "Delivery", to: "/dispatch" },
+  ];
   const navigate = useNavigate();
   const logout = useLogoutMutation();
 
   useEffect(() => {
+    if (!sample) return;
     const root = document.documentElement;
     const previousTheme = root.dataset.theme;
     const previousBs = root.dataset.bsTheme;
@@ -265,7 +349,7 @@ export function WorkspaceLayout({ role }: { role: WorkspaceRole }) {
       if (previousBs) root.dataset.bsTheme = previousBs;
       else delete root.dataset.bsTheme;
     };
-  }, []);
+  }, [sample]);
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -290,7 +374,7 @@ export function WorkspaceLayout({ role }: { role: WorkspaceRole }) {
     <div className="ws-root">
       <div className="ws-shell">
         <aside className="ws-sidebar">
-          <SidebarContent role={role} />
+          <SidebarContent role={role} sample={sample} />
         </aside>
 
         {drawerOpen ? (
@@ -312,7 +396,7 @@ export function WorkspaceLayout({ role }: { role: WorkspaceRole }) {
                   <XIcon />
                 </Button>
               </div>
-              <SidebarContent role={role} onNavigate={() => setDrawerOpen(false)} />
+              <SidebarContent role={role} sample={sample} onNavigate={() => setDrawerOpen(false)} />
             </div>
           </div>
         ) : null}
@@ -335,13 +419,15 @@ export function WorkspaceLayout({ role }: { role: WorkspaceRole }) {
               <p className="truncate text-sm font-semibold leading-tight">{activeItem?.label ?? "Workspace"}</p>
             </div>
 
-            <span className="hidden items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-1 text-[0.625rem] font-semibold uppercase tracking-wider text-warning sm:inline-flex">
-              <InfoIcon className="size-3" /> Sample records
-            </span>
+            {sample ? (
+              <span className="hidden items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-1 text-[0.625rem] font-semibold uppercase tracking-wider text-warning sm:inline-flex">
+                <InfoIcon className="size-3" /> Sample records
+              </span>
+            ) : null}
 
             <div className="ws-role-switch" role="navigation" aria-label="Switch role view">
               {roleLinks.map((link) => (
-                <NavLink key={link.role} to={link.to} end={link.role !== "admin"}>
+                <NavLink key={link.role} to={link.to} end={link.role === "admin" ? !sample : true}>
                   {link.label}
                 </NavLink>
               ))}
@@ -374,8 +460,10 @@ export function WorkspaceLayout({ role }: { role: WorkspaceRole }) {
                   onMouseLeave={() => setMenuOpen(false)}
                 >
                   <div className="border-b border-border/70 p-1.5 pb-2">
-                    <p className="truncate text-sm font-medium">{user?.fullName ?? "Preview user"}</p>
-                    <p className="truncate text-xs text-muted-foreground">{user?.email ?? "Preview mode"}</p>
+                    <p className="truncate text-sm font-medium">{user?.fullName ?? "User"}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {user?.email ?? (sample ? "Sample workspace" : "Signed in")}
+                    </p>
                   </div>
                   <div className="pt-1">
                     <Link
@@ -395,14 +483,16 @@ export function WorkspaceLayout({ role }: { role: WorkspaceRole }) {
                       Notifications
                       {unread > 0 ? <span className="ws-nav-badge">{unread}</span> : null}
                     </Link>
-                    <Link
-                      to="/"
-                      role="menuitem"
-                      className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      Standard console
-                    </Link>
+                    {sample ? (
+                      <Link
+                        to="/"
+                        role="menuitem"
+                        className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Standard console
+                      </Link>
+                    ) : null}
                     <button
                       type="button"
                       role="menuitem"
@@ -427,6 +517,8 @@ export function WorkspaceLayout({ role }: { role: WorkspaceRole }) {
       <div className="sr-only" aria-live="polite">
         {activeItem ? `Current page: ${activeItem.label}` : ""}
       </div>
+      <SessionTimeout />
+      <Toaster />
     </div>
   );
 }

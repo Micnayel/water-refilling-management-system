@@ -60,12 +60,12 @@ function guard(permission: string, element: ReactNode) {
   return <ProtectedRoute grant={permission}>{element}</ProtectedRoute>;
 }
 
-function workspace(role: "customer" | "admin" | "rider") {
+function workspace(role: "customer" | "admin" | "rider", sample = role !== "admin") {
   const grant =
     role === "rider" ? "scheduling:view" : role === "admin" ? "admin:view" : "dashboard:view";
   return (
     <ProtectedRoute grant={grant}>
-      <WorkspaceLayout role={role} />
+      <WorkspaceLayout role={role} sample={sample} />
     </ProtectedRoute>
   );
 }
@@ -149,7 +149,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/overview",
-    element: workspace("admin"),
+    element: workspace("admin", true),
     children: [
       { index: true, element: <AdminOverview /> },
       { path: "orders", element: <AdminOrders /> },
