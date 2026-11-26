@@ -76,7 +76,14 @@
 .ws-nav {
   flex: 1;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   padding: 0.25rem 0.65rem 1rem;
+}
+
+.ws-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .ws-nav-group {
