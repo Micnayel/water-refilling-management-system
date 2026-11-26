@@ -2,8 +2,7 @@ import type { ReactElement } from "react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { PreviewOnlyRoute } from "@/modules/workspace/PreviewOnlyRoute";
+import { MemoryRouter } from "react-router-dom";
 import { useWorkspaceStore } from "@/modules/workspace/store";
 import { CustomerDashboard } from "@/modules/workspace/pages/customer/CustomerDashboard";
 import { CustomerOrder } from "@/modules/workspace/pages/customer/CustomerOrder";
@@ -72,26 +71,6 @@ describe("workspace screens", () => {
     expect(screen.getByText("Sales and order analytics")).toBeInTheDocument();
     await user.click(screen.getAllByRole("button", { name: "Approve" })[0]!);
     expect(useWorkspaceStore.getState().registrations[0]?.status).toBe("Approved");
-  });
-
-  it("keeps preview workspaces closed outside preview builds", () => {
-    render(
-      <MemoryRouter initialEntries={["/portal"]}>
-        <Routes>
-          <Route
-            path="/portal"
-            element={
-              <PreviewOnlyRoute>
-                <div>preview workspace</div>
-              </PreviewOnlyRoute>
-            }
-          />
-          <Route path="/" element={<div>standard console</div>} />
-        </Routes>
-      </MemoryRouter>,
-    );
-    expect(screen.getByText("standard console")).toBeInTheDocument();
-    expect(screen.queryByText("preview workspace")).not.toBeInTheDocument();
   });
 
   it("marks every customer notification as read", async () => {

@@ -47,7 +47,6 @@ import {
   CustomerOrder,
   CustomerSubscription,
   CustomerTracking,
-  PreviewOnlyRoute,
   ProfilePage,
   RiderCustomers,
   RiderDeliveries,
@@ -62,11 +61,11 @@ function guard(permission: string, element: ReactNode) {
 }
 
 function workspace(role: "customer" | "admin" | "rider") {
+  const grant =
+    role === "rider" ? "scheduling:view" : role === "admin" ? "admin:view" : "dashboard:view";
   return (
-    <ProtectedRoute>
-      <PreviewOnlyRoute>
-        <WorkspaceLayout role={role} />
-      </PreviewOnlyRoute>
+    <ProtectedRoute grant={grant}>
+      <WorkspaceLayout role={role} />
     </ProtectedRoute>
   );
 }

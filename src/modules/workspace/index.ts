@@ -1,5 +1,4 @@
 export { WorkspaceLayout } from "./components/WorkspaceLayout";
-export { PreviewOnlyRoute } from "./PreviewOnlyRoute";
 export { WorkspaceNotificationsPage } from "./components/NotificationsFeed";
 export { ProfilePage } from "./pages/ProfilePage";
 export { CustomerDashboard } from "./pages/customer/CustomerDashboard";

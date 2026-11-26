@@ -336,10 +336,10 @@ export function WorkspaceLayout({ role }: { role: WorkspaceRole }) {
             </div>
 
             <span className="hidden items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-1 text-[0.625rem] font-semibold uppercase tracking-wider text-warning sm:inline-flex">
-              <InfoIcon className="size-3" /> Preview data
+              <InfoIcon className="size-3" /> Sample records
             </span>
 
-            <div className="ws-role-switch" role="navigation" aria-label="Preview another role">
+            <div className="ws-role-switch" role="navigation" aria-label="Switch role view">
               {roleLinks.map((link) => (
                 <NavLink key={link.role} to={link.to} end={link.role !== "admin"}>
                   {link.label}
@@ -364,7 +364,7 @@ export function WorkspaceLayout({ role }: { role: WorkspaceRole }) {
                   {initials(user?.fullName ?? roleMeta[role].name)}
                 </span>
                 <span className="hidden max-w-[9rem] truncate text-xs font-medium sm:block">
-                  {user?.fullName ?? "Preview"}
+                  {user?.fullName ?? "User"}
                 </span>
               </button>
               {menuOpen ? (

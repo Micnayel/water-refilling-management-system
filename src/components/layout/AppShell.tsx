@@ -39,7 +39,6 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
   const user = useSessionStore((state) => state.user);
   const navigate = useNavigate();
   const logout = useLogoutMutation();
-  const preview = isPreviewMode();
 
   const onLogout = async () => {
     try {
@@ -93,31 +92,35 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
           );
         })}
 
-        {preview ? (
-          <div className="mb-4">
-            {!collapsed ? (
-              <p className="mb-1.5 px-2.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70">
-                Design preview
-              </p>
-            ) : (
-              <div className="mx-auto mb-2 h-px w-6 bg-foreground/10" aria-hidden="true" />
-            )}
-            <div className="space-y-0.5">
+        <div className="mb-4">
+          {!collapsed ? (
+            <p className="mb-1.5 px-2.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70">
+              Role workspaces
+            </p>
+          ) : (
+            <div className="mx-auto mb-2 h-px w-6 bg-foreground/10" aria-hidden="true" />
+          )}
+          <div className="space-y-0.5">
+            {user && hasGrant(user, "dashboard:view") ? (
               <NavLink to="/portal" onClick={onNavigate} className="nav-pill">
                 <DropletIcon className="size-4 shrink-0" />
                 <span className="truncate">Customer portal</span>
               </NavLink>
+            ) : null}
+            {user && hasGrant(user, "admin:view") ? (
               <NavLink to="/overview" onClick={onNavigate} className="nav-pill">
                 <DashboardIcon className="size-4 shrink-0" />
                 <span className="truncate">Admin workspace</span>
               </NavLink>
+            ) : null}
+            {user && hasGrant(user, "scheduling:view") ? (
               <NavLink to="/dispatch" onClick={onNavigate} className="nav-pill">
                 <TruckIcon className="size-4 shrink-0" />
                 <span className="truncate">Delivery workspace</span>
               </NavLink>
-            </div>
+            ) : null}
           </div>
-        ) : null}
+        </div>
       </nav>
 
       {!collapsed ? (

@@ -52,7 +52,7 @@ export function AdminOverview() {
       <PageHeading
         eyebrow="Operations overview"
         title="Good day, administrator"
-        subtitle="Live picture of customers, orders, deliveries, and stock. All figures are synthetic preview data."
+        subtitle="Customers, orders, deliveries, and stock in one view. Sample records until live portal data is connected."
         actions={
           <>
             <Link to="/overview/orders">
