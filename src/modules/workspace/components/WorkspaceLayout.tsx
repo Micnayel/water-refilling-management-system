@@ -90,16 +90,6 @@ const liveAdminGroups: WorkspaceNavGroup[] = [
       { label: "System Settings", to: "/settings", icon: SettingsIcon, grant: "settings:view" },
     ],
   },
-  {
-    label: "Sample records",
-    items: [
-      { label: "Sample overview", to: "/overview", icon: DashboardIcon, end: true },
-      { label: "Orders", to: "/overview/orders", icon: ClipboardIcon },
-      { label: "Subscriptions", to: "/overview/subscriptions", icon: CalendarIcon },
-      { label: "Deliveries", to: "/overview/deliveries", icon: TruckIcon },
-      { label: "Delivery tracking", to: "/overview/tracking", icon: MapIcon },
-    ],
-  },
 ];
 
 function useNavGroups(role: WorkspaceRole, sample: boolean): WorkspaceNavGroup[] {
@@ -491,6 +481,16 @@ export function WorkspaceLayout({
                         onClick={() => setMenuOpen(false)}
                       >
                         Standard console
+                      </Link>
+                    ) : null}
+                    {!sample && role === "admin" ? (
+                      <Link
+                        to="/overview"
+                        role="menuitem"
+                        className="block rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Sample workspace
                       </Link>
                     ) : null}
                     <button
