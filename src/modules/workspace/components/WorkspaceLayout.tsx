@@ -320,7 +320,7 @@ export function WorkspaceLayout({
   const profilePath = role === "customer" ? "/portal/profile" : role === "rider" ? "/dispatch/profile" : "/settings";
   const roleLinks: Array<{ role: WorkspaceRole; label: string; to: string }> = [
     { role: "customer", label: "Customer", to: "/portal" },
-    { role: "admin", label: "Admin", to: role === "admin" && !sample ? "/" : "/overview" },
+    { role: "admin", label: "Admin", to: "/" },
     { role: "rider", label: "Delivery", to: "/dispatch" },
   ];
   const navigate = useNavigate();
@@ -417,7 +417,7 @@ export function WorkspaceLayout({
 
             <div className="ws-role-switch" role="navigation" aria-label="Switch role view">
               {roleLinks.map((link) => (
-                <NavLink key={link.role} to={link.to} end={link.role === "admin" ? !sample : true}>
+                <NavLink key={link.role} to={link.to} end={link.role === "admin"}>
                   {link.label}
                 </NavLink>
               ))}
