@@ -22,6 +22,14 @@ export function useSubscriptionList(page: number, pageSize: number, status: stri
   });
 }
 
+export function useCustomerSubscriptions(customerId: string | undefined) {
+  return useQuery({
+    queryKey: [...subscriptionKeys.list, "customer", customerId ?? "none"],
+    queryFn: () => service.querySubscriptions({ customerId: customerId as string, pageSize: 100 }),
+    enabled: Boolean(customerId),
+  });
+}
+
 export function useSubscription(id: string | undefined) {
   return useQuery({
     queryKey: subscriptionKeys.detail(id ?? "none"),

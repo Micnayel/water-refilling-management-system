@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/ui/page-header";
 import { useToast } from "@/components/ui/toaster";
 import { apiMessage } from "@/lib/api-client";
@@ -7,6 +7,8 @@ import { useCreateSubscription } from "./hooks";
 
 export function SubscriptionNewPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const prefillCustomerId = searchParams.get("customerId") ?? "";
   const create = useCreateSubscription();
   const toast = useToast();
 
@@ -15,6 +17,7 @@ export function SubscriptionNewPage() {
       <PageHeader title="New subscription" description="Create a recurring refill plan for a customer." />
       <div className="card-surface p-4">
         <SubscriptionForm
+          defaultValues={prefillCustomerId ? { customerId: prefillCustomerId } : undefined}
           submitLabel="Create subscription"
           pending={create.isPending}
           error={create.error}

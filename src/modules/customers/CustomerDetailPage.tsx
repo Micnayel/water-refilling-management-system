@@ -16,6 +16,7 @@ import { formatDateNumeric } from "@/lib/dates";
 import { formatNumber } from "@/lib/money";
 import { usePermission } from "@/hooks/use-permission";
 import { useCustomer, useCustomerStatus, useRevealCustomer } from "./hooks";
+import { CustomerSubscriptions } from "./components/CustomerSubscriptions";
 
 const REMASK_MS = 45_000;
 
@@ -234,6 +235,8 @@ export function CustomerDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      <CustomerSubscriptions customerId={customer.id} />
 
       <Dialog
         open={confirmOpen !== false}

@@ -65,12 +65,13 @@ export async function findSubscription(db: Database, id: string): Promise<Public
 
 export async function querySubscriptions(
   db: Database,
-  input: { cursor?: string; pageSize?: number; status?: string; search?: string },
+  input: { cursor?: string; pageSize?: number; status?: string; search?: string; customerId?: string },
 ): Promise<Page<PublicSubscription>> {
   const offset = decodeCursor(input.cursor);
   const pageSize = input.pageSize ?? 20;
   const filters = [];
   if (input.status) filters.push(eq(subscriptions.status, input.status));
+  if (input.customerId) filters.push(eq(subscriptions.customerId, input.customerId));
   if (input.search) filters.push(like(customers.name, `%${input.search}%`));
 
   const rows = await db

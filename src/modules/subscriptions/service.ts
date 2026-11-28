@@ -8,6 +8,7 @@ export function querySubscriptions(input: {
   pageSize?: number;
   status?: string;
   search?: string;
+  customerId?: string;
 }) {
   return apiRequest("/subscriptions/query", { method: "POST", body: input, schema: subscriptionPageSchema });
 }

@@ -32,4 +32,5 @@ export const querySubscriptionsSchema = z.object({
   pageSize: z.number().int().min(1).max(100).optional(),
   status: z.enum(SUBSCRIPTION_STATUSES).optional(),
   search: z.string().trim().max(160).optional(),
+  customerId: z.string().uuid().optional(),
 });
