@@ -43,6 +43,20 @@ export const modules: ModuleDefinition[] = [
     permission: "scheduling:view",
   },
   {
+    id: "orders",
+    name: "Order History",
+    description: "Every order with status, amount, and delivery details.",
+    path: "/orders",
+    permission: "scheduling:view",
+  },
+  {
+    id: "subscriptions",
+    name: "Subscription Management",
+    description: "Recurring refill plans and their lifecycle.",
+    path: "/subscriptions",
+    permission: "scheduling:view",
+  },
+  {
     id: "reports",
     name: "Reports",
     description: "Period summaries and exports.",

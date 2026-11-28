@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { scheduleSchema } from "@/modules/scheduling";
 
 export const dashboardSummarySchema = z.object({
   salesTodayCentavos: z.number(),
@@ -6,9 +7,40 @@ export const dashboardSummarySchema = z.object({
   salesMonthCentavos: z.number(),
   salesMonthCount: z.number(),
   clientCount: z.number(),
+  totalCustomers: z.number(),
   inventoryFull: z.number(),
   inventoryWithCustomer: z.number(),
   lowStockCount: z.number(),
+  activeSubscriptions: z.number(),
+  todaysOrders: z.number(),
+  pendingOrders: z.number(),
+  ongoingDeliveries: z.number(),
+  completedDeliveries: z.number(),
+  revenueTotalCentavos: z.number(),
+  revenueTodayCentavos: z.number(),
+  revenueMonthCentavos: z.number(),
+  analyticsSeries: z.array(
+    z.object({ date: z.string(), salesCentavos: z.number(), orders: z.number() }),
+  ),
+  recentCustomers: z.array(
+    z.object({
+      id: z.string(),
+      code: z.string(),
+      name: z.string(),
+      status: z.string(),
+      createdAt: z.string().nullable(),
+    }),
+  ),
+  latestOrders: z.array(scheduleSchema),
+  deliveryMonitoring: z.object({
+    scheduled: z.number(),
+    ongoing: z.number(),
+    completed: z.number(),
+    cancelled: z.number(),
+    total: z.number(),
+  }),
+  inventoryItemCount: z.number(),
+  lowStockItems: z.array(z.object({ name: z.string(), gallonsFull: z.number(), reorderLevel: z.number() })),
   clientLocationStats: z.array(z.object({ area: z.string(), count: z.number() })),
 });
 

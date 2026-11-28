@@ -93,6 +93,23 @@ export const schedules = mysqlTable("schedules", {
   updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
 });
 
+export const subscriptions = mysqlTable("subscriptions", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  customerId: varchar("customer_id", { length: 36 }).notNull(),
+  planName: varchar("plan_name", { length: 120 }).notNull().default("Standard refill"),
+  status: varchar("status", { length: 24 }).notNull().default("Active"),
+  gallonsPerDelivery: int("gallons_per_delivery").notNull().default(1),
+  frequency: varchar("frequency", { length: 24 }).notNull().default("weekly"),
+  priceCentavos: int("price_centavos").notNull().default(0),
+  startDate: varchar("start_date", { length: 10 }).notNull(),
+  nextBillingDate: varchar("next_billing_date", { length: 10 }),
+  assignedUserId: varchar("assigned_user_id", { length: 36 }),
+  notes: varchar("notes", { length: 500 }).notNull().default(""),
+  version: int("version").notNull().default(1),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+});
+
 export const sales = mysqlTable("sales", {
   id: varchar("id", { length: 36 }).primaryKey(),
   scheduleId: varchar("schedule_id", { length: 36 }).notNull().unique(),

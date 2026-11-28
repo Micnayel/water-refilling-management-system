@@ -26,6 +26,7 @@ import { initials } from "@/lib/utils";
 import { SessionTimeout } from "@/components/session/SessionTimeout";
 import { Toaster } from "@/components/ui/toaster";
 import { useWorkspaceStore } from "../store";
+import { useUnreadNotificationCount } from "@/modules/notifications";
 import { DEMO_CUSTOMER_ID } from "../data";
 import { unreadCount } from "../selectors";
 import type { WorkspaceRole } from "../types";
@@ -65,6 +66,8 @@ const liveAdminGroups: WorkspaceNavGroup[] = [
     items: [
       { label: "Customer Management", to: "/customers", icon: UsersIcon, grant: "customers:view" },
       { label: "Scheduling", to: "/scheduling", icon: CalendarIcon, grant: "scheduling:view" },
+      { label: "Order History", to: "/orders", icon: ClipboardIcon, grant: "scheduling:view" },
+      { label: "Subscription Management", to: "/subscriptions", icon: CalendarIcon, grant: "scheduling:view" },
       { label: "Inventory Management", to: "/inventory", icon: PackageIcon, grant: "inventory:view" },
     ],
   },
@@ -73,19 +76,12 @@ const liveAdminGroups: WorkspaceNavGroup[] = [
     items: [
       { label: "Reports and Analytics", to: "/reports", icon: FileTextIcon, grant: "reports:view" },
       { label: "Audit trail", to: "/audit", icon: ClipboardIcon, grant: "audit:view" },
-      { label: "Notifications", to: "/notifications", icon: BellIcon, grant: "notifications:view" },
     ],
   },
   {
     label: "Administration",
     items: [
       { label: "User Management", to: "/administration/users", icon: ShieldIcon, grant: "admin:view" },
-      {
-        label: "Pending registrations",
-        to: "/administration/users/pending",
-        icon: UsersIcon,
-        grant: "admin:view",
-      },
       { label: "Roles", to: "/administration/roles", icon: ShieldIcon, grant: "admin:view" },
       { label: "System Settings", to: "/settings", icon: SettingsIcon, grant: "settings:view" },
     ],
@@ -93,10 +89,6 @@ const liveAdminGroups: WorkspaceNavGroup[] = [
 ];
 
 function useNavGroups(role: WorkspaceRole, sample: boolean): WorkspaceNavGroup[] {
-  const unread = useWorkspaceStore((state) =>
-    role === "admin" && !sample ? 0 : unreadCount(state, role),
-  );
-
   if (role === "customer") {
     return [
       {
@@ -112,7 +104,6 @@ function useNavGroups(role: WorkspaceRole, sample: boolean): WorkspaceNavGroup[]
         items: [
           { label: "Order History", to: "/portal/history", icon: ClipboardIcon },
           { label: "Delivery Tracking", to: "/portal/tracking", icon: TruckIcon },
-          { label: "Notifications", to: "/portal/notifications", icon: BellIcon, badge: unread },
         ],
       },
       {
@@ -134,10 +125,7 @@ function useNavGroups(role: WorkspaceRole, sample: boolean): WorkspaceNavGroup[]
       },
       {
         label: "Account",
-        items: [
-          { label: "Notifications", to: "/dispatch/notifications", icon: BellIcon, badge: unread },
-          { label: "My Profile", to: "/dispatch/profile", icon: UsersIcon },
-        ],
+        items: [{ label: "My Profile", to: "/dispatch/profile", icon: UsersIcon }],
       },
     ];
   }
@@ -169,9 +157,7 @@ function useNavGroups(role: WorkspaceRole, sample: boolean): WorkspaceNavGroup[]
       items: [
         { label: "Reports and Analytics", to: "/reports", icon: FileTextIcon },
         { label: "Audit trail", to: "/audit", icon: ClipboardIcon },
-        { label: "Notifications", to: "/notifications", icon: BellIcon },
         { label: "User Management", to: "/administration/users", icon: ShieldIcon },
-        { label: "Pending registrations", to: "/administration/users/pending", icon: UsersIcon },
         { label: "Roles", to: "/administration/roles", icon: ShieldIcon },
         { label: "System Settings", to: "/settings", icon: SettingsIcon },
       ],
@@ -311,9 +297,9 @@ export function WorkspaceLayout({
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const user = useSessionStore((state) => state.user);
-  const unread = useWorkspaceStore((state) =>
-    role === "admin" && !sample ? 0 : unreadCount(state, role),
-  );
+  const sampleUnread = useWorkspaceStore((state) => unreadCount(state, role));
+  const apiUnread = useUnreadNotificationCount(!sample && role === "admin").data ?? 0;
+  const unread = role === "admin" && !sample ? apiUnread : sampleUnread;
   const groups = useNavGroups(role, sample);
   const notificationsPath =
     role === "customer" ? "/portal/notifications" : role === "rider" ? "/dispatch/notifications" : "/notifications";
@@ -463,15 +449,6 @@ export function WorkspaceLayout({
                       onClick={() => setMenuOpen(false)}
                     >
                       My profile
-                    </Link>
-                    <Link
-                      to={notificationsPath}
-                      role="menuitem"
-                      className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      Notifications
-                      {unread > 0 ? <span className="ws-nav-badge">{unread}</span> : null}
                     </Link>
                     {sample ? (
                       <Link

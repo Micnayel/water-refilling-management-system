@@ -410,9 +410,31 @@ export function previewResponse(path: string, method: string, body: unknown): un
       salesMonthCentavos: 8_742_000,
       salesMonthCount: 486,
       clientCount: 248,
+      totalCustomers: 252,
       inventoryFull: 792,
       inventoryWithCustomer: 725,
       lowStockCount: 2,
+      activeSubscriptions: 128,
+      todaysOrders: 27,
+      pendingOrders: 46,
+      ongoingDeliveries: 12,
+      completedDeliveries: 214,
+      revenueTotalCentavos: 184_742_000,
+      revenueTodayCentavos: 486_000,
+      revenueMonthCentavos: 8_742_000,
+      analyticsSeries: Array.from({ length: 14 }, (_, index) => ({
+        date: new Date(Date.now() - (13 - index) * 86_400_000).toISOString().slice(0, 10),
+        salesCentavos: 480_000 + index * 12_000,
+        orders: 18 + index,
+      })),
+      recentCustomers: [
+        { id: UUID.customer(91), code: "C-00091", name: "M***", status: "active", createdAt: new Date().toISOString() },
+        { id: UUID.customer(92), code: "C-00092", name: "R***", status: "active", createdAt: new Date().toISOString() },
+      ],
+      latestOrders: [],
+      deliveryMonitoring: { scheduled: 46, ongoing: 12, completed: 214, cancelled: 9, total: 281 },
+      inventoryItemCount: 5,
+      lowStockItems: [{ name: "Sample gallon", gallonsFull: 8, reorderLevel: 10 }],
       clientLocationStats: AREAS.map(({ area, count }) => ({ area, count })),
     };
   }
@@ -615,6 +637,14 @@ export function previewResponse(path: string, method: string, body: unknown): un
     const event = text(input.event);
     const filtered = event ? auditEvents.filter((entry) => entry.event === event) : auditEvents;
     return { items: filtered.slice(0, numberValue(input.pageSize)), nextCursor: null };
+  }
+
+  if (method === "POST" && pathname === "/subscriptions/query") {
+    return { items: [], nextCursor: null };
+  }
+
+  if (method === "GET" && pathname === "/notifications/unread-count") {
+    return { count: 0 };
   }
 
   if (method === "GET" && pathname === "/notifications") {

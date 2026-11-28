@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Alert } from "@/components/ui/alert";
 import { Badge, statusTone } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -24,8 +24,11 @@ import { apiMessage } from "@/lib/api-client";
 import { downloadFile } from "@/lib/download";
 import { usePermission } from "@/hooks/use-permission";
 import { useRoles, useSetUserActive, useUserList } from "./hooks";
+import { PendingRegistrationsPanel } from "./PendingRegistrationsPanel";
 
 export function UserListPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get("tab") === "pending" ? "pending" : "users";
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [searchInput, setSearchInput] = useState("");
@@ -85,14 +88,36 @@ export function UserListPage() {
                 Export
               </Button>
             ) : null}
-            <Link to="/administration/users/pending" className={buttonVariants({ variant: "outline" })}>
-              Pending registrations
-            </Link>
             {canAdd ? <Button onClick={() => navigate("/administration/users/new")}>New user</Button> : null}
           </>
         }
       />
 
+      <div className="flex gap-1 border-b border-border" role="tablist" aria-label="User management sections">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "users"}
+          className={"btn-reset rounded-t-md px-3 py-2 text-sm font-medium transition-colors " + (tab === "users" ? "border-b-2 border-primary text-foreground" : "text-muted-foreground hover:text-foreground")}
+          onClick={() => setSearchParams({}, { replace: true })}
+        >
+          Users
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "pending"}
+          className={"btn-reset rounded-t-md px-3 py-2 text-sm font-medium transition-colors " + (tab === "pending" ? "border-b-2 border-primary text-foreground" : "text-muted-foreground hover:text-foreground")}
+          onClick={() => setSearchParams({ tab: "pending" }, { replace: true })}
+        >
+          Pending registrations
+        </button>
+      </div>
+
+      {tab === "pending" ? <PendingRegistrationsPanel /> : null}
+
+      {tab === "users" ? (
+      <>
       <form className="toolbar-surface flex flex-wrap items-end gap-2" onSubmit={onSearch} role="search">
         <div className="min-w-[12rem] flex-1">
           <label htmlFor="user-search" className="text-xs font-medium text-muted-foreground">
@@ -216,6 +241,8 @@ export function UserListPage() {
       <Alert tone="info">
         A user cannot raise their own grants, and the last active administrator cannot be deactivated.
       </Alert>
+      </>
+      ) : null}
 
       <Dialog
         open={Boolean(target)}

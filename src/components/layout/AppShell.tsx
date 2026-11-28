@@ -23,6 +23,7 @@ import { usePermission } from "@/hooks/use-permission";
 import { hasGrant, useSessionStore } from "@/stores/session-store";
 import { useUiStore } from "@/stores/ui-store";
 import { useLogoutMutation } from "@/modules/auth";
+import { useUnreadNotificationCount } from "@/modules/notifications";
 import { WorkspaceLayout } from "@/modules/workspace";
 import { SessionTimeout } from "@/components/session/SessionTimeout";
 
@@ -178,6 +179,7 @@ function StandardAppShell() {
   const navigate = useNavigate();
   const logout = useLogoutMutation();
   const canSeeNotifications = usePermission("notifications:view");
+  const unreadNotifications = useUnreadNotificationCount(canSeeNotifications).data ?? 0;
   const preview = isPreviewMode();
 
   const allItems = navigation.flatMap((group) => group.items);
@@ -270,8 +272,18 @@ function StandardAppShell() {
           ) : null}
 
           {canSeeNotifications ? (
-            <Button variant="ghost" size="icon" aria-label="Notifications" onClick={() => navigate("/notifications")}>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={`Notifications (${unreadNotifications} unread)`}
+              onClick={() => navigate("/notifications")}
+            >
               <BellIcon />
+              {unreadNotifications > 0 ? (
+                <span className="ml-0.5 inline-flex min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[0.625rem] font-semibold text-destructive-foreground">
+                  {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                </span>
+              ) : null}
             </Button>
           ) : null}
           <div className="relative">

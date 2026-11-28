@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { desc, eq, isNull, or } from "drizzle-orm";
+import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
 import type { AppContext } from "../../context";
 import { notifications } from "../../db/schema";
 import { errors } from "../../lib/errors";
@@ -15,7 +15,7 @@ export async function registerNotificationRoutes(app: FastifyInstance, ctx: AppC
       .from(notifications)
       .where(or(isNull(notifications.userId), eq(notifications.userId, actor.id)))
       .orderBy(desc(notifications.createdAt))
-      .limit(50);
+      .limit(200);
     return {
       items: rows.map((row) => ({
         id: row.id,
@@ -25,6 +25,21 @@ export async function registerNotificationRoutes(app: FastifyInstance, ctx: AppC
         createdAt: row.createdAt ? new Date(row.createdAt).toISOString() : null,
       })),
     };
+  });
+
+  app.get("/notifications/unread-count", hooks, async (request) => {
+    ctx.assertGrant(request, "notifications:view");
+    const actor = ctx.requireUser(request);
+    const rows = await ctx.db
+      .select({ value: sql<number>`count(*)` })
+      .from(notifications)
+      .where(
+        and(
+          isNull(notifications.readAt),
+          or(isNull(notifications.userId), eq(notifications.userId, actor.id)),
+        ),
+      );
+    return { count: Number(rows[0]?.value ?? 0) };
   });
 
   app.post<{ Params: { id: string } }>("/notifications/:id/read", hooks, async (request) => {

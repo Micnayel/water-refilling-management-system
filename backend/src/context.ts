@@ -2,7 +2,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { eq } from "drizzle-orm";
 import { env } from "./config/env";
 import type { Database } from "./db/client";
-import { auditEvents, users } from "./db/schema";
+import { auditEvents, notifications, users } from "./db/schema";
 import { ApiError, errors } from "./lib/errors";
 import { newId } from "./lib/crypto";
 import { parseGrants } from "./lib/grants";
@@ -48,6 +48,57 @@ export async function loadUserById(db: Database, id: string): Promise<AuthUser |
   return row ? toAuthUser(row) : null;
 }
 
+const ENTITY_LABELS: Record<string, string> = {
+  user: "user",
+  role: "role",
+  customer: "customer",
+  inventory: "inventory item",
+  inventory_item: "inventory item",
+  schedule: "order",
+  sale: "sale",
+  subscription: "subscription",
+  setting: "setting",
+  notification: "notification",
+};
+
+const VERB_MAP: Record<string, string> = {
+  create: "created",
+  update: "updated",
+  delete: "deleted",
+  export: "exported",
+  approve: "approved",
+  reject: "rejected",
+  reveal: "revealed",
+  access: "accessed",
+  read: "read",
+};
+
+// Explicit, non-sensitive phrasing for events that do not follow PREFIX_VERB.
+const EVENT_OVERRIDES: Record<string, string> = {
+  AUTH_LOGIN: "User signed in",
+  AUTH_LOGOUT: "User signed out",
+  AUTH_LOGIN_FAILED: "Failed sign-in attempt",
+  AUTH_REGISTER: "Registration submitted",
+  SETTINGS_UPDATE: "Setting updated",
+};
+
+export function notificationKind(event: string): string {
+  const prefix = event.split("_")[0] ?? "info";
+  return prefix.toLowerCase().slice(0, 32) || "info";
+}
+
+export function notificationMessage(event: string, entityType: string, detail?: string): string {
+  const label = ENTITY_LABELS[entityType] ?? entityType.replaceAll("_", " ");
+  const suffix = detail && detail.trim() ? ` (${detail.trim()})` : "";
+  const override = EVENT_OVERRIDES[event];
+  if (override) return `${override}${suffix}`.slice(0, 255);
+  const words = event.toLowerCase().split("_");
+  const verbWord = words[words.length - 1] ?? "";
+  const action = event === "ACCESS" ? "accessed" : (VERB_MAP[verbWord] ?? verbWord);
+  const heading = `${label} ${action}`;
+  return `${heading.charAt(0).toUpperCase() + heading.slice(1)}${suffix}`.slice(0, 255);
+}
+
 export function createContext(db: Database, sessions: SessionStore): AppContext {
   const audit: AppContext["audit"] = async (input) => {
     await db.insert(auditEvents).values({
@@ -58,6 +109,18 @@ export function createContext(db: Database, sessions: SessionStore): AppContext 
       entityId: input.entityId ?? null,
       detail: input.detail ?? "",
     });
+    // Every audited transaction also surfaces as a non-sensitive notification.
+    // Notification delivery is best-effort and never blocks the audited action.
+    try {
+      await db.insert(notifications).values({
+        id: newId(),
+        userId: null,
+        kind: notificationKind(input.event),
+        message: notificationMessage(input.event, input.entityType, input.detail),
+      });
+    } catch {
+      // Notifications must not break the underlying transaction.
+    }
   };
 
   const authenticate: AppContext["authenticate"] = async (request) => {

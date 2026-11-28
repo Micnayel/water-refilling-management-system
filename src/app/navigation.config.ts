@@ -1,6 +1,5 @@
 import type { ComponentType, SVGProps } from "react";
 import {
-  BellIcon,
   CalendarIcon,
   ClipboardIcon,
   DashboardIcon,
@@ -39,6 +38,8 @@ export const navigation: NavGroup[] = [
       { label: "Inventory", to: "/inventory", icon: PackageIcon, grant: "inventory:view" },
       { label: "Customers", to: "/customers", icon: UsersIcon, grant: "customers:view" },
       { label: "Scheduling", to: "/scheduling", icon: CalendarIcon, grant: "scheduling:view" },
+      { label: "Order History", to: "/orders", icon: ClipboardIcon, grant: "scheduling:view" },
+      { label: "Subscriptions", to: "/subscriptions", icon: CalendarIcon, grant: "scheduling:view" },
     ],
   },
   {
@@ -46,7 +47,6 @@ export const navigation: NavGroup[] = [
     items: [
       { label: "Reports", to: "/reports", icon: FileTextIcon, grant: "reports:view" },
       { label: "Audit trail", to: "/audit", icon: ClipboardIcon, grant: "audit:view" },
-      { label: "Notifications", to: "/notifications", icon: BellIcon, grant: "notifications:view" },
     ],
   },
   {
@@ -56,12 +56,6 @@ export const navigation: NavGroup[] = [
         label: "User management",
         to: "/administration/users",
         icon: ShieldIcon,
-        grant: "admin:view",
-      },
-      {
-        label: "Pending registrations",
-        to: "/administration/users/pending",
-        icon: UsersIcon,
         grant: "admin:view",
       },
       { label: "Roles", to: "/administration/roles", icon: ShieldIcon, grant: "admin:view" },

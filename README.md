@@ -273,16 +273,22 @@ Permissions use the `module:view|add|edit|delete` grant format, matching AGENTS.
 | Scheduling new | `/scheduling/new` | `scheduling:add` grant |
 | Scheduling detail | `/scheduling/:id` | `scheduling:view` |
 | Scheduling edit | `/scheduling/:id/edit` | `scheduling:edit` grant |
+| Order History | `/orders` | `scheduling:view` |
+| Order History detail | `/orders/:id` | `scheduling:view` |
+| Subscription Management | `/subscriptions` | `scheduling:view` |
+| Subscription new | `/subscriptions/new` | `scheduling:add` grant |
+| Subscription detail | `/subscriptions/:id` | `scheduling:view` |
+| Subscription edit | `/subscriptions/:id/edit` | `scheduling:edit` grant |
 | Reports | `/reports` | `reports:view` |
 | Audit trail | `/audit` | `audit:view` |
 | User Management | `/administration/users` | `admin:view` |
-| Pending registrations | `/administration/users/pending` | `admin:view` |
+| Pending registrations (tab in User Management) | `/administration/users?tab=pending`; `/administration/users/pending` redirects here | `admin:view` |
 | User new | `/administration/users/new` | `admin:add` grant |
 | User edit | `/administration/users/:id/edit` | `admin:edit` grant |
 | Administration roles | `/administration/roles` | `admin:view` |
 | Administration permissions | `/administration/permissions` | `admin:view` |
 | System maintenance | `/administration/system-maintenance` | `admin:view` |
-| Notifications | `/notifications` | `notifications:view` |
+| Notifications (top-bar bell icon; no menu item) | `/notifications` | `notifications:view` |
 | Settings | `/settings` | `settings:view` |
 | Customer portal | `/portal`, `/portal/subscription`, `/portal/order`, `/portal/history`, `/portal/tracking`, `/portal/profile`, `/portal/notifications` | `dashboard:view` |
 | Admin workspace | `/overview`, `/overview/orders`, `/overview/subscriptions`, `/overview/deliveries`, `/overview/tracking` | `admin:view` (sample records) |
@@ -402,7 +408,7 @@ Page
 #### Role workspaces
 
 - Routes: `/portal` (customer), `/overview` (administrator sample pages), and `/dispatch` (delivery personnel). Each route tree requires a signed-in session and the grant listed in the routes table.
-- Admin shell: signed-in users with `admin:view` render every API-backed admin route inside `WorkspaceLayout role="admin"`. The sidebar exposes Overview, Heat Map, Customer Management, Scheduling, Inventory Management, Reports and Analytics, Audit trail, Notifications, User Management, Pending registrations, Roles, and System Settings, filtered by the user's grants. The live shell keeps the user's chosen template and hides the sample badge.
+- Admin shell: signed-in users with `admin:view` render every API-backed admin route inside `WorkspaceLayout role="admin"`. The sidebar exposes Overview, Heat Map, Customer Management, Scheduling, Order History, Subscription Management, Inventory Management, Reports and Analytics, Audit trail, User Management, Roles, and System Settings, filtered by the user's grants. Notifications are reached through the top-bar bell icon only; pending registrations is a tab inside User Management. The live shell keeps the user's chosen template and hides the sample badge.
 - Data: `src/modules/workspace/data.ts` holds sample customers, plans, subscriptions, orders, deliveries, transactions, notifications, inventory, registrations, and revenue points. `store.ts` holds them in a Zustand store so sample actions (place or cancel an order, confirm an order, pause or skip a subscription, change a plan, advance a delivery, approve a registration, reveal contact, edit a profile) are real within the session.
 - Design: one shared `WorkspaceLayout`, status pill, stat card, table, timeline, chart, notification, dialog, and tracking component set, styled by `workspace.css` on the existing tokens. Sample workspaces apply the light Aqua template while mounted and restore the previous template on exit; the live admin shell leaves the selected template untouched.
 - Tracking: the map is a deliberately stylised SVG route, labelled "Simulated route preview — not live GPS". It never requests Google Maps, never displays coordinates, and offers a text alternative for keyboard and screen-reader users.

@@ -11,6 +11,7 @@ import { registerHeatMapRoutes } from "./modules/heat-map/routes";
 import { registerInventoryRoutes } from "./modules/inventory/routes";
 import { registerCustomerRoutes } from "./modules/customers/routes";
 import { registerSchedulingRoutes } from "./modules/scheduling/routes";
+import { registerSubscriptionRoutes } from "./modules/subscriptions/routes";
 import { registerUserRoutes } from "./modules/users/routes";
 import { registerSettingsRoutes } from "./modules/settings/routes";
 import { registerReportRoutes } from "./modules/reports/routes";
@@ -77,6 +78,7 @@ export async function buildServer(options: ServerOptions = {}): Promise<FastifyI
       await registerInventoryRoutes(api, ctx);
       await registerCustomerRoutes(api, ctx);
       await registerSchedulingRoutes(api, ctx);
+      await registerSubscriptionRoutes(api, ctx);
       await registerUserRoutes(api, ctx);
       await registerSettingsRoutes(api, ctx);
       await registerReportRoutes(api, ctx);

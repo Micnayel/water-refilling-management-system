@@ -27,8 +27,14 @@ import {
 import { ReportsPage } from "@/modules/reports";
 import { AuditPage } from "@/modules/audit";
 import { NotificationsPage } from "@/modules/notifications";
+import { OrderDetailPage, OrderListPage } from "@/modules/orders";
 import {
-  PendingRegistrationsPage,
+  SubscriptionDetailPage,
+  SubscriptionEditPage,
+  SubscriptionListPage,
+  SubscriptionNewPage,
+} from "@/modules/subscriptions";
+import {
   PermissionsPage,
   RolesPage,
   UserEditPage,
@@ -99,6 +105,14 @@ export const router = createBrowserRouter([
       { path: "scheduling/:id", element: guard("scheduling:view", <ScheduleDetailPage />) },
       { path: "scheduling/:id/edit", element: guard("scheduling:edit", <ScheduleEditPage />) },
 
+      { path: "orders", element: guard("scheduling:view", <OrderListPage />) },
+      { path: "orders/:id", element: guard("scheduling:view", <OrderDetailPage />) },
+
+      { path: "subscriptions", element: guard("scheduling:view", <SubscriptionListPage />) },
+      { path: "subscriptions/new", element: guard("scheduling:add", <SubscriptionNewPage />) },
+      { path: "subscriptions/:id", element: guard("scheduling:view", <SubscriptionDetailPage />) },
+      { path: "subscriptions/:id/edit", element: guard("scheduling:edit", <SubscriptionEditPage />) },
+
       { path: "reports", element: guard("reports:view", <ReportsPage />) },
       { path: "audit", element: guard("audit:view", <AuditPage />) },
       { path: "notifications", element: guard("notifications:view", <NotificationsPage />) },
@@ -109,7 +123,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "administration/users/pending",
-        element: guard("admin:view", <PendingRegistrationsPage />),
+        element: <Navigate to="/administration/users?tab=pending" replace />,
       },
       {
         path: "administration/users/new",

@@ -19,6 +19,10 @@ export function listNotifications() {
   return apiRequest("/notifications", { schema: notificationListSchema });
 }
 
+export function getUnreadCount() {
+  return apiRequest("/notifications/unread-count", { schema: z.object({ count: z.number() }) });
+}
+
 export function markNotificationRead(id: string) {
   return apiRequest(`/notifications/${id}/read`, {
     method: "POST",

@@ -100,8 +100,15 @@ All paths are relative to `/api/v1` unless noted.
 | GET | `/reports/summary` | `reports:view` | Aggregated period figures. |
 | GET | `/reports/export` | `reports:export` | Audited CSV export. |
 | POST | `/audit/query` | `audit:view` | Paged audit events. |
-| GET | `/notifications` | `notifications:view` | Scoped feed. |
+| GET | `/notifications` | `notifications:view` | Scoped feed; every audited transaction also emits a notification. |
+| GET | `/notifications/unread-count` | `notifications:view` | Unread count for the current scope. |
 | POST | `/notifications/:id/read` | `notifications:view` | Marks one notice read. |
+| POST | `/subscriptions/query` | `scheduling:view` | Paged subscriptions. |
+| GET | `/subscriptions/:id` | `scheduling:view` | Subscription detail. |
+| POST | `/subscriptions` | `scheduling:add` | Creates a recurring plan. |
+| PATCH | `/subscriptions/:id` | `scheduling:edit` | Versioned update. |
+| POST | `/subscriptions/:id/status` | `scheduling:edit` | Lifecycle transition (Active, Paused, Cancelled). |
+| GET | `/subscriptions/export` | `scheduling:export` | Audited CSV export. |
 | POST | `/users/query` | `admin:view` | Paged users. |
 | GET | `/users/pending` | `admin:view` | Pending registrations. |
 | GET | `/users/:id` | `admin:view` | User detail. |
@@ -146,11 +153,14 @@ Every audit row stores an opaque actor ID, event name, entity type, opaque entit
 | `DASHBOARD_EXPORT`, `HEATMAP_EXPORT`, `REPORTS_EXPORT` | Read-only module exports. |
 | `INVENTORY_CREATE`, `INVENTORY_UPDATE`, `INVENTORY_DELETE`, `INVENTORY_EXPORT` | Inventory mutations and export. |
 | `CUSTOMER_CREATE`, `CUSTOMER_UPDATE`, `CUSTOMER_DELETE`, `CUSTOMER_EXPORT` | Customer mutations, lifecycle, and export. |
-| `SCHEDULE_CREATE`, `SCHEDULE_UPDATE`, `SCHEDULE_DELETE`, `SCHEDULE_EXPORT` | Scheduling mutations and export. |
+| `SCHEDULE_CREATE`, `SCHEDULE_UPDATE`, `SCHEDULE_DELETE`, `SCHEDULE_EXPORT` | Scheduling mutations and export. Order History reads these schedule records. |
+| `SUBSCRIPTION_CREATE`, `SUBSCRIPTION_UPDATE`, `SUBSCRIPTION_EXPORT` | Subscription mutations and export. |
 | `USER_CREATE`, `USER_UPDATE`, `USER_DELETE`, `USER_EXPORT` | Administration mutations and export. |
 | `SETTINGS_UPDATE` | System setting changes. |
 
 Audit entries must not contain names, addresses, contact numbers, coordinates, or other personal data.
+
+Every call to `ctx.audit()` also inserts a non-sensitive notification (no names or identifiers) so all transactions appear in `/notifications`. Notification delivery is best-effort and never blocks the audited action.
 
 ## Database and migrations
 

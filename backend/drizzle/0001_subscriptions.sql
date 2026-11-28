@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  customer_id VARCHAR(36) NOT NULL,
+  plan_name VARCHAR(120) NOT NULL DEFAULT 'Standard refill',
+  status VARCHAR(24) NOT NULL DEFAULT 'Active',
+  gallons_per_delivery INT NOT NULL DEFAULT 1,
+  frequency VARCHAR(24) NOT NULL DEFAULT 'weekly',
+  price_centavos INT NOT NULL DEFAULT 0,
+  start_date VARCHAR(10) NOT NULL,
+  next_billing_date VARCHAR(10) NULL,
+  assigned_user_id VARCHAR(36) NULL,
+  notes VARCHAR(500) NOT NULL DEFAULT '',
+  version INT NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
