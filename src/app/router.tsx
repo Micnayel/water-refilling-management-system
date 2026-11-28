@@ -123,7 +123,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "administration/users/pending",
-        element: <Navigate to="/administration/users?tab=pending" replace />,
+        element: guard("admin:view", <Navigate to="/administration/users?tab=pending" replace />),
       },
       {
         path: "administration/users/new",
