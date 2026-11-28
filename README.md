@@ -66,6 +66,7 @@ The router exposes workspaces rather than a forced screen sequence, but records 
 3. Viewing a customer shows the full details and exact map location for users with `customers:reveal`; the reveal is audited and remasks automatically. Other users keep masking and see the generalized barangay map.
 4. Sensitive fields stay masked until a permitted, audited reveal.
 5. Gallons on hand and delivery history update as schedules complete.
+5a. The customer detail page shows the customer's subscriptions; administrators and managers with `scheduling:view` see them and those with `scheduling:add`/`scheduling:edit` can create, edit, pause, resume, or cancel plans (see Subscription Management).
 6. Customers who stop ordering are archived, and can be restored.
 
 ### Scheduling
